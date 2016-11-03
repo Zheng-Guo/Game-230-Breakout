@@ -7,9 +7,11 @@ using namespace sf;
 class PowerUp:public RectangleShape{
 private:
 	Texture texture;
+	int powerUpType;
 	bool present;
 public:
-	PowerUp():present(false){
+	PowerUp(int p):present(false),
+	powerUpType(p){
 		texture.loadFromFile("Present.png");
 		setTexture(&texture);
 		setSize(Vector2f(60, 60));	
@@ -23,7 +25,7 @@ int PowerUp::interact(Ball &ball) {//Return the player that obtains the power up
 	FloatRect ballBound = ball.getGlobalBounds();
 	FloatRect powerUpBound = getGlobalBounds();
 	if (ballBound.intersects(powerUpBound)) {
-		return ball.getPlayer();
+		return ball.getPowerUpType();
 	}
 	return 0;
 }

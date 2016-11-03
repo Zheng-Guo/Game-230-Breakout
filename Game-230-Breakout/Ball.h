@@ -5,10 +5,11 @@ using namespace sf;
 
 class Ball :public CircleShape{
 private:
+	Texture texture;
 	Vector2f velocity;
-	int player;//The last player hitting the ball
+	int powerUpType;//The current power up applied to the ball
 public:
-	Ball(float r=0,float x=0,float y=0) :CircleShape(r),player(0) {
+	Ball(float r=0,float x=0,float y=0) :CircleShape(r),powerUpType(0) {
 		CircleShape::setPosition(x, y);
 		CircleShape::setFillColor(Color::Yellow);
 		CircleShape::setOutlineColor(Color::Black);
@@ -18,6 +19,6 @@ public:
 	void setYSpeed(float s) { velocity.y = s; }
 	Vector2f getVelocity() const { return velocity; }
 	void move() { CircleShape::move(velocity); }
-	int getPlayer() { return player; }
-	void setPlayer(int p) { player = p; }
+	int getPowerUpType() { return powerUpType; }
+	void setPowerUpType(int p) { powerUpType = p; }
 };
