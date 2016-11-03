@@ -4,7 +4,7 @@
 using namespace sf;
 
 class Brick :public RectangleShape {
-private:
+protected:
 	Texture texture;
 	int durability;
 public:

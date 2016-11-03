@@ -10,15 +10,14 @@ class Player {
 private:
 	Paddle paddle;
 	int score;
-	int player;
-	float leftBound, rightBound,powerUpEnd;
+	int powerUpType;
+	float leftBound, rightBound;
 	bool poweredUp, powerUpUsed;
 public:
-	Player(Vector2f position,float l,float r,float pe) :paddle(20, 100, 0.08),
+	Player(Vector2f position,float l,float r) :paddle(100, 20, 0.08),
 		score(0),
 		leftBound(l),
 		rightBound(r),
-		powerUpEnd(pe),
 		poweredUp(false),
 		powerUpUsed(false){
 		paddle.setOutlineColor(Color::Black);
@@ -34,6 +33,8 @@ public:
 	void moveLeft();
 	void moveRight();
 	void interact(Ball &ball);
+	void setPowerUpType(int p) { powerUpType = p; }
+	int getPowerUpType() { return poweredUp; }
 	void setPowerUp(bool p) { poweredUp = p; }
 	void setPowerUpUsed(bool p) { powerUpUsed = p; }
 	bool isPoweredUp() { return poweredUp; }
