@@ -11,7 +11,7 @@ private:
 public:
 	Ball(float r=0,float x=0,float y=0) :CircleShape(r),powerUpType(0) {
 		CircleShape::setPosition(x, y);
-		CircleShape::setFillColor(Color::Yellow);
+		CircleShape::setFillColor(Color::White);
 		CircleShape::setOutlineColor(Color::Black);
 	}
 	void accelerate(Vector2f v) { velocity.x += v.x; velocity.y += v.y; }

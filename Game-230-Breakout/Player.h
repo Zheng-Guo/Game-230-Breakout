@@ -34,6 +34,7 @@ public:
 	void resetScore() { score = 0; }
 	void scorePoint() { score += 1; }
 	int getScore() { return score; }
+	int getLives() { return life; }
 	void moveLeft();
 	void moveRight();
 	void interact(Ball &ball);
