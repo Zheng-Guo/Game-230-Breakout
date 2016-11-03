@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <SFML\Graphics.hpp>
+#include "GameConstants.h"
 #include "Paddle.h"
 
 using namespace sf;
@@ -10,22 +11,25 @@ class Player {
 private:
 	Paddle paddle;
 	int score;
+	int life;
 	int powerUpType;
 	float leftBound, rightBound;
 	bool poweredUp, powerUpUsed;
 public:
-	Player(Vector2f position,float l,float r) :paddle(100, 20, 0.08),
+	Player(Vector2f position,float l,float r) :paddle(Paddle_Width, Paddle_Height, Deflection_Coefficient),
 		score(0),
+		life(Player_Initial_Lives),
 		leftBound(l),
 		rightBound(r),
 		poweredUp(false),
 		powerUpUsed(false){
 		paddle.setOutlineColor(Color::Black);
 		paddle.setPosition(position);
-		paddle.setSpeed(5);
+		paddle.setSpeed(Paddle_Speed);
 		srand(time(NULL));
 	}
 	Paddle getPaddle() { return paddle; }
+	void setPaddleColor(Color c) { paddle.setFillColor(c); }
 	void setPaddlePosition(float x, float y) { paddle.setPosition(x, y); }
 	void resetScore() { score = 0; }
 	void scorePoint() { score += 1; }
