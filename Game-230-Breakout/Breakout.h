@@ -22,17 +22,18 @@ private:
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
+	bool gameStart;
 public:
 	Breakout():window(VideoMode(Window_Width,Window_Height),"Breakout",Style::Close|Style::Titlebar),
 		playArea(Play_Area_Width,Play_Area_Height),
 		player(Vector2f(Play_Area_X_Position+Play_Area_Width/2-Paddle_Width/2,Play_Area_Y_Position+Play_Area_Height-Paddle_Height),Play_Area_X_Position,Play_Area_X_Position+Play_Area_Width),
-		ball(Ball_Radius){
+		ball(Ball_Radius),
+		gameStart(false){
 		srand(time(NULL));
 		window.setPosition(Vector2i(400, 0));
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
 		player.setPaddleColor(Color::Blue);
-		int initialBallXPosition = rand() % (int)(Paddle_Width - Ball_Radius * 2)+Play_Area_X_Position+Play_Area_Width/2-Paddle_Width/2;
-		ball.setPosition(initialBallXPosition, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
+		ball.setPosition(Play_Area_X_Position+Play_Area_Width/2-Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 		font.loadFromFile("Tinos-Regular.ttf");
 		stringstream ss;
 		string s;
@@ -68,18 +69,24 @@ void Breakout::startGame() {
 				moveLeft = true;
 			if (Keyboard::isKeyPressed(Keyboard::Right))
 				moveRight = true;
-			if (Keyboard::isKeyPressed(Keyboard::Space))
-				ball.setYSpeed(Ball_Initial_Y_Speed);
+			if (Keyboard::isKeyPressed(Keyboard::Space) && !gameStart) {
+				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
+				ball.setXSpeed(initialBallXSpeed);
+				ball.setYSpeed(Ball_Initial_Speed);
+				gameStart = true;
+			}
 		}
 		time2 = clock.getElapsedTime();
 		time3 = time2 - time1;
 		if (time3.asSeconds() >= Refresh_Interval) {
 			time1 = time2;
 			ball.move();
+			int i=playArea.interact(ball);
 			if (moveLeft)
 				player.moveLeft();
 			if (moveRight)
 				player.moveRight();
+			player.interact(ball);
 		}
 
 		window.clear(Color::Cyan);
