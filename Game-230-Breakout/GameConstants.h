@@ -1,4 +1,7 @@
 #pragma once
+#include <SFML\Graphics.hpp>
+using namespace sf;
+
 const float Window_Width = 920;
 const float Window_Height = 900;
 const float Play_Area_Width = 720;
@@ -25,4 +28,5 @@ const int Life_X_Position = 10;
 const int Life_Y_Position = 40;
 const int Number_Of_Brick_Per_Row = 9;
 const char Config_File_Name[] = "level_config.txt";
+const Color Play_Area_Color = Color::Green;
 enum Element{Water=2,Fire,Earth,Wind,Thunder,Null};

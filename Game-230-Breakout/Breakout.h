@@ -55,7 +55,7 @@ public:
 		lives.setPosition(Life_X_Position,Life_Y_Position);
 		Brick::loadTextures();
 		currentLevel.setBricks("Level1.txt");
-		
+		currentLevel.setColorAfterBroken(Play_Area_Color);
 	}
 	void startGame();
 };

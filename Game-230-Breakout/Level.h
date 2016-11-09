@@ -2,7 +2,7 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <string>
@@ -22,6 +22,7 @@ private:
 public:
 	//Level(){}
 	void setBricks(string fileName);
+	void setColorAfterBroken(Color c);
 	int interact(Ball &ball);
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
@@ -30,6 +31,10 @@ public:
 void Level::setEdgeExposure() {
 	for (int i = 0; i < brickGrid.size(); i++) {
 		for (int j = 0; j < brickGrid[i].size(); j++) {
+			brickGrid[i][j]->setTopExposure(true);
+			brickGrid[i][j]->setBottomExposure(true);
+			brickGrid[i][j]->setLeftExposure(true);
+			brickGrid[i][j]->setRightExposure(true);
 			if (i == 0)
 				brickGrid[i][j]->setTopExposure(false);
 			if (j == 0)
@@ -68,10 +73,22 @@ void Level::setBricks(string fileName) {
 	setEdgeExposure();
 }
 
-int Level::interact(Ball &ball) {
+void Level::setColorAfterBroken(Color c) {
 	for (shared_ptr<Brick> b : bricks) {
-		b->interact(ball);
+		b->setFillColor(c);
 	}
+}
+int Level::interact(Ball &ball) {
+	float xSpeed=ball.getVelocity().x, ySpeed=ball.getVelocity().y;
+	for (shared_ptr<Brick> b : bricks) {
+		pair<bool,bool> velocityFlip=b->interact(ball);
+		if (velocityFlip.first)
+			xSpeed = -ball.getVelocity().x;
+		if (velocityFlip.second)
+			ySpeed = -ball.getVelocity().y;
+	}
+	ball.setXSpeed(xSpeed);
+	ball.setYSpeed(ySpeed);
 	setEdgeExposure();
 	return 1;
 }

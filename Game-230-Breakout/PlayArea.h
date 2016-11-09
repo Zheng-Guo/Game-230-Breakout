@@ -8,7 +8,7 @@ class PlayArea :public RectangleShape {
 private:
 public:
 	PlayArea(float w, float h) :RectangleShape(Vector2f(w, h)) {
-		setFillColor(Color::Green);
+		setFillColor(Play_Area_Color);
 		setOutlineColor(Color::Black);
 		setOutlineThickness(2);
 	}

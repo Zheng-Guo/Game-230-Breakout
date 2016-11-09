@@ -1,9 +1,11 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <utility>
 #include "Ball.h"
 #include "Paddle.h"
 
 using namespace sf;
+using namespace std;
 
 class Brick :public RectangleShape {
 protected:
@@ -28,7 +30,7 @@ public:
 		setTexture(&textures[0]);
 		background.setFillColor(Color::White);
 	}
-	virtual int interact(Ball &ball);
+	virtual pair<bool, bool> interact(Ball &ball);
 	virtual void act(Ball &ball,Paddle &paddle);
 	void setPosition(float x, float y);
 	void setBackground(Color c) { background.setFillColor(c); }
@@ -50,41 +52,38 @@ void Brick::loadTextures() {
 	textures[3].loadFromFile("brick/Brick cracked 3.png");
 }
 
-int Brick::interact(Ball &ball) {
+pair<bool,bool> Brick::interact(Ball &ball) {
 	FloatRect ballBound = ball.getGlobalBounds();
 	FloatRect brickBound = getGlobalBounds();
+	bool flipX = false, flipY = false;
 	if (durability > 0) {
 		if (ball.getVelocity().y > 0 && topExposed &&
-			(brickBound.contains(Vector2f(ballBound.left, ballBound.top + ballBound.height)) || brickBound.contains(Vector2f(ballBound.left + ballBound.width, ballBound.top + ballBound.height)))) {
-			ball.setYSpeed(-ball.getVelocity().y);
-			durability = 0;
-			setTexture(nullptr);
-			background.setFillColor(Color::Green);
+			(brickBound.contains(ballBound.left, ballBound.top + ballBound.height) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height))) {
+			flipY = true;
 		}
 		if (ball.getVelocity().y < 0 && bottomExposed &&
-			(brickBound.contains(Vector2f(ballBound.left, ballBound.top)) || brickBound.contains(Vector2f(ballBound.left + ballBound.width, ballBound.top)))) {
-			ball.setYSpeed(-ball.getVelocity().y);
-			durability = 0;
-			setTexture(nullptr);
-			background.setFillColor(Color::Green);
+			(brickBound.contains(ballBound.left, ballBound.top) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top))) {
+			flipY = true;
 		}
 		if (ball.getVelocity().x>0 && leftExposed &&
-			(brickBound.contains(Vector2f(ballBound.left + ballBound.width, ballBound.top)) || brickBound.contains(Vector2f(ballBound.left + ballBound.width, ballBound.top + ballBound.height)))) {
-			ball.setXSpeed(-ball.getVelocity().x);
-			durability = 0;
-			setTexture(nullptr);
-			background.setFillColor(Color::Green);
+			(brickBound.contains(ballBound.left + ballBound.width, ballBound.top) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height))) {
+			flipX = true;
 		}
 		if (ball.getVelocity().x<0 && rightExposed &&
-			(brickBound.contains(Vector2f(ballBound.left, ballBound.top)) || brickBound.contains(Vector2f(ballBound.left, ballBound.top + ballBound.height)))) {
-			ball.setXSpeed(-ball.getVelocity().x);
+			(brickBound.contains(ballBound.left, ballBound.top) || brickBound.contains(ballBound.left, ballBound.top + ballBound.height))) {
+			flipX = true;
+		}
+		if (flipX||flipY) {
 			durability = 0;
 			setTexture(nullptr);
-			background.setFillColor(Color::Green);
+			if (flipX&&flipY) {
+				flipX = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height); 
+				flipY = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
+			}
 		}
 	}
 	
-	return 1;
+	return pair<bool,bool>(flipX,flipY);
 }
 
 void Brick::act(Ball &ball, Paddle &paddle) {
