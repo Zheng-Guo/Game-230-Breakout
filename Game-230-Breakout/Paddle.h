@@ -16,7 +16,7 @@ public:
 	Paddle(float width = 0, float height = 0, float dec = 0) :RectangleShape(Vector2f(width, height)),
 		deflection(dec) {
 		setOutlineColor(Color::Black);
-		buffer.loadFromFile("hit_ball.wav");
+		buffer.loadFromFile("audio/hit_ball.wav");
 		hitBall.setBuffer(buffer);
 	}
 	void setSpeed(float s) { speed = s; }

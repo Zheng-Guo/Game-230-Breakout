@@ -8,6 +8,8 @@
 #include "PlayArea.h"
 #include "Player.h"
 #include "Ball.h"
+#include "Brick.h"
+#include "Level.h"
 
 using namespace sf;
 using namespace std;
@@ -16,48 +18,50 @@ class Breakout {
 private:
 	RenderWindow window;
 	PlayArea playArea;
+	Level currentLevel;
 	Player player;
 	Ball ball;
 	Text score, lives;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
-	bool gameStart;
+	bool gameStart,gameOver;
 public:
 	Breakout():window(VideoMode(Window_Width,Window_Height),"Breakout",Style::Close|Style::Titlebar),
 		playArea(Play_Area_Width,Play_Area_Height),
 		player(Vector2f(Play_Area_X_Position+Play_Area_Width/2-Paddle_Width/2,Play_Area_Y_Position+Play_Area_Height-Paddle_Height),Play_Area_X_Position,Play_Area_X_Position+Play_Area_Width),
 		ball(Ball_Radius),
-		gameStart(false){
+		gameStart(false),
+		gameOver(false){
 		srand(time(NULL));
 		window.setPosition(Vector2i(400, 0));
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
 		player.setPaddleColor(Color::Blue);
 		ball.setPosition(Play_Area_X_Position+Play_Area_Width/2-Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 		font.loadFromFile("Tinos-Regular.ttf");
-		stringstream ss;
-		string s;
+		ostringstream ss;
 		ss << "Score: " << player.getScore();
-		ss >> s;
-		score.setString(s);
+		score.setString(ss.str());
 		score.setFont(font);
 		score.setCharacterSize(Stat_Character_Size);
 		score.setFillColor(Color::Yellow);
 		score.setPosition(Score_X_Position, Score_Y_Position);
-		ss.clear();
+		ss.str("");
 		ss << "Lives: " << player.getLives();
-		ss >> s;
-		lives.setString(s);
+		lives.setString(ss.str());
 		lives.setFont(font);
 		lives.setCharacterSize(Stat_Character_Size);
 		lives.setFillColor(Color::Red);
 		lives.setPosition(Life_X_Position,Life_Y_Position);
+		Brick::loadTextures();
+		currentLevel.setBricks("Level1.txt");
+		
 	}
 	void startGame();
 };
 
 void Breakout::startGame() {
-	bool moveLeft, moveRight;
+	bool moveLeft = false, moveRight = false;
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
 		Event event;
@@ -87,10 +91,12 @@ void Breakout::startGame() {
 			if (moveRight)
 				player.moveRight();
 			player.interact(ball);
+			currentLevel.interact(ball);
 		}
 
 		window.clear(Color::Cyan);
 		window.draw(playArea);
+		currentLevel.render(window);
 		window.draw(player.getPaddle());
 		window.draw(ball);
 		window.draw(score);
