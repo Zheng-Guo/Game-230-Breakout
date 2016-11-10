@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include <utility>
+#include "GameConstants.h"
 #include "Ball.h"
 #include "Paddle.h"
 
@@ -46,10 +47,10 @@ public:
 Texture Brick::textures[4];
 
 void Brick::loadTextures() {
-	textures[0].loadFromFile("brick/Brick.png");
-	textures[1].loadFromFile("brick/Brick cracked 1.png");
-	textures[2].loadFromFile("brick/Brick cracked 2.png");
-	textures[3].loadFromFile("brick/Brick cracked 3.png");
+	textures[0].loadFromFile(string(Texture_Folder)+'/'+string(Texture_Brick_Subfolder)+string("/Brick.png"));
+	textures[1].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 1.png");
+	textures[2].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 2.png");
+	textures[3].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 3.png");
 }
 
 pair<bool,bool> Brick::interact(Ball &ball) {

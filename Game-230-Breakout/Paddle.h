@@ -1,9 +1,12 @@
 #pragma once
+#include <string>
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio.hpp>
+#include "GameConstants.h"
 #include "Ball.h"
 
 using namespace sf;
+using namespace std;
 
 class Paddle :public RectangleShape {
 private:
@@ -16,7 +19,7 @@ public:
 	Paddle(float width = 0, float height = 0, float dec = 0) :RectangleShape(Vector2f(width, height)),
 		deflection(dec) {
 		setOutlineColor(Color::Black);
-		buffer.loadFromFile("audio/hit_ball.wav");
+		buffer.loadFromFile(Audio_Folder+string("/hit_ball.wav"));
 		hitBall.setBuffer(buffer);
 	}
 	void setSpeed(float s) { speed = s; }
