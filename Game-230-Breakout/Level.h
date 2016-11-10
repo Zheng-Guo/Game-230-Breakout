@@ -18,16 +18,17 @@ private:
 	vector<shared_ptr<Brick>> bricks;
 	vector<vector<shared_ptr<Brick>>> brickGrid;
 	string levelName;
+	int initialNumberOfBricks;
 	int numberOfBricks;
 	void setEdgeExposure();
 public:
 	//Level(){}
 	void loadConfig(string fileName);
 	void resetBricks();
-	void setColorAfterBroken(Color c);
 	int interact(Ball &ball);
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
+	string getLevelName() { return levelName; }
 };
 
 void Level::setEdgeExposure() {
@@ -57,7 +58,7 @@ void Level::setEdgeExposure() {
 
 void Level::loadConfig(string fileName) {
 	ifstream ifs(fileName);
-	ifs >> levelName;
+	getline(ifs,levelName);
 	int brickType;
 	while (ifs >> brickType) {
 		shared_ptr<Brick> brick;
@@ -70,6 +71,7 @@ void Level::loadConfig(string fileName) {
 		if(!brick->isBrickEmpty())
 			++numberOfBricks;
 	}
+	initialNumberOfBricks = numberOfBricks;
 	auto ite = bricks.begin();
 	for (int i = 0; ite != bricks.end(); ++i) {
 		vector<shared_ptr<Brick>> brickRow;
@@ -82,16 +84,12 @@ void Level::loadConfig(string fileName) {
 }
 
 void Level::resetBricks() {
+	numberOfBricks = initialNumberOfBricks;
 	for (shared_ptr<Brick> b : bricks) {
 		b->setDisplay();
 	}
 }
 
-void Level::setColorAfterBroken(Color c) {
-	for (shared_ptr<Brick> b : bricks) {
-		b->setFillColor(c);
-	}
-}
 int Level::interact(Ball &ball) {
 	float xSpeed=ball.getVelocity().x, ySpeed=ball.getVelocity().y;
 	for (shared_ptr<Brick> b : bricks) {

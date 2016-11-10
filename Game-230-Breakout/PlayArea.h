@@ -9,8 +9,6 @@ private:
 public:
 	PlayArea(float w, float h) :RectangleShape(Vector2f(w, h)) {
 		setFillColor(Play_Area_Color);
-		setOutlineColor(Color::Black);
-		setOutlineThickness(2);
 	}
 
 	int interact(Ball &ball);
