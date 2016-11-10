@@ -42,7 +42,8 @@ public:
 		srand(time(NULL));
 		window.setPosition(Vector2i(400, 0));
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
-		
+		player.setPaddleColor(Color::Blue);
+		resetPlayer();
 		font.loadFromFile("Tinos-Regular.ttf");
 		ostringstream ss;
 		ss << "Score: " << player.getScore();
@@ -70,18 +71,22 @@ void Breakout::resetPlayer() {
 	gameStart = false;
 	player.setPaddlePosition(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height);
 	ball.setPosition(Play_Area_X_Position + Play_Area_Width / 2 - Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
+	ball.setXSpeed(0);
+	ball.setYSpeed(0);
 }
 
 void Breakout::resetGame() {
 	resetPlayer();
+	levelEnd = false;
+	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
 	player.resetScore();
 	player.resetLives();
+	player.setPowerUpType(Element::Normal);
 }
 
 void Breakout::startGame() {
 	bool moveLeft = false, moveRight = false;
-	bool gameStart = false, gameOver = false, levelClear = false;
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
 		Event event;
@@ -106,6 +111,13 @@ void Breakout::startGame() {
 			time1 = time2;
 			ball.move();
 			int i=playArea.interact(ball);
+			if (i == 1) {
+				player.lostLife();
+				resetPlayer();
+				ostringstream ss;
+				ss << "Lives: " << player.getLives();
+				lives.setString(ss.str());
+			}
 			if (moveLeft)
 				player.moveLeft();
 			if (moveRight)

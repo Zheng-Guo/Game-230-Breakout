@@ -34,6 +34,7 @@ public:
 	void resetScore() { score = 0; }
 	void scorePoint() { score += 1; }
 	int getScore() { return score; }
+	void lostLife() { --life; }
 	int getLives() { return life; }
 	void resetLives() { life = Player_Initial_Lives; }
 	void moveLeft();
