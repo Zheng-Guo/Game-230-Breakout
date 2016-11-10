@@ -62,11 +62,13 @@ void Level::loadConfig(string fileName) {
 	while (ifs >> brickType) {
 		shared_ptr<Brick> brick;
 		switch (brickType) {
+		case 0:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case 1:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
 		bricks.push_back(brick);
-		++numberOfBricks;
+		if(!brick->isBrickEmpty())
+			++numberOfBricks;
 	}
 	auto ite = bricks.begin();
 	for (int i = 0; ite != bricks.end(); ++i) {

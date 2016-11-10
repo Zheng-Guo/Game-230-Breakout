@@ -14,13 +14,14 @@ protected:
 	RectangleShape background;
 	int durability;
 	int score;
-	bool waterUpgraded, earthUpgraded, windUpgraded;
+	bool isEmpty,waterUpgraded, earthUpgraded, windUpgraded;
 	bool topExposed, bottomExposed, leftExposed, rightExposed;
 public:
-	Brick(float x, float y,int d,int s) :RectangleShape(Vector2f(x, y)),
+	Brick(float x, float y,int d,int s,bool e=false) :RectangleShape(Vector2f(x, y)),
 		background(Vector2f(x,y)),
 		durability(d),
 		score(s),
+		isEmpty(e),
 		waterUpgraded(false),
 		earthUpgraded(false),
 		windUpgraded(false),
@@ -40,7 +41,9 @@ public:
 	void setBottomExposure(bool b) { bottomExposed = b; }
 	void setLeftExposure(bool b) { leftExposed = b; }
 	void setRightExposure(bool b) { rightExposed = b; }
+	void setDurability(int d) { durability = d; }
 	bool isBroken() { return durability == 0; }
+	bool isBrickEmpty() { return isEmpty; }
 	static void loadTextures();
 };
 
@@ -97,6 +100,9 @@ void Brick::setPosition(float x, float y) {
 }
 
 void Brick::setDisplay() {
-	setTexture(&textures[0]);
-	background.setFillColor(Normal_Brick_Background_Color);
+	if (!isEmpty) {
+		durability = Brick_Duribility;
+		setTexture(&textures[0]);
+		background.setFillColor(Normal_Brick_Background_Color);
+	}
 }

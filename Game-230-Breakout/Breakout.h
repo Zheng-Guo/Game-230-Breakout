@@ -24,7 +24,7 @@ private:
 	shared_ptr<Level> currentLevel;
 	Player player;
 	Ball ball;
-	Text score, lives;
+	Text score, lives,message;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
@@ -59,6 +59,11 @@ public:
 		lives.setCharacterSize(Stat_Character_Size);
 		lives.setFillColor(Color::Red);
 		lives.setPosition(Life_X_Position,Life_Y_Position);
+		message.setString("");
+		message.setFont(font);
+		message.setCharacterSize(Message_Character_Size);
+		message.setFillColor(Color::Red);
+		message.setPosition(Message_X_Position,Message_Y_Position);
 		Brick::loadTextures();
 		//currentLevel.setBricks(string(Config_Folder)+'/'+string("Level1.txt"));
 		//currentLevel.setColorAfterBroken(Play_Area_Color);
@@ -73,6 +78,7 @@ void Breakout::resetPlayer() {
 	ball.setPosition(Play_Area_X_Position + Play_Area_Width / 2 - Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 	ball.setXSpeed(0);
 	ball.setYSpeed(0);
+	ball.setPowerUpType(Element::Normal);
 }
 
 void Breakout::resetGame() {
@@ -82,6 +88,14 @@ void Breakout::resetGame() {
 	currentLevel = levelManager.getFirstLevel();
 	player.resetScore();
 	player.resetLives();
+	player.setPowerUpType(Element::Normal);
+}
+
+void Breakout::nextLevel() {
+	resetPlayer();
+	levelEnd = false;
+	gameOver = false;
+	currentLevel = levelManager.getNextLevel();
 	player.setPowerUpType(Element::Normal);
 }
 
@@ -113,6 +127,7 @@ void Breakout::startGame() {
 			int i=playArea.interact(ball);
 			if (i == 1) {
 				player.lostLife();
+				moveLeft = false, moveRight = false;
 				resetPlayer();
 				ostringstream ss;
 				ss << "Lives: " << player.getLives();
@@ -124,7 +139,11 @@ void Breakout::startGame() {
 				player.moveRight();
 			player.interact(ball);
 			currentLevel->interact(ball);
-			//if(currentLevel->allClear())
+			if (currentLevel->allClear()) {
+				moveLeft = false, moveRight = false;
+				nextLevel();
+				message.setString("All Clear");
+			}
 		}
 
 		window.clear(Color::Cyan);
@@ -134,6 +153,7 @@ void Breakout::startGame() {
 		window.draw(ball);
 		window.draw(score);
 		window.draw(lives);
+		window.draw(message);
 		window.display();
 	}
 }
