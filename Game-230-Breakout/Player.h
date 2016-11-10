@@ -35,6 +35,7 @@ public:
 	void scorePoint() { score += 1; }
 	int getScore() { return score; }
 	int getLives() { return life; }
+	void resetLives() { life = Player_Initial_Lives; }
 	void moveLeft();
 	void moveRight();
 	void interact(Ball &ball);

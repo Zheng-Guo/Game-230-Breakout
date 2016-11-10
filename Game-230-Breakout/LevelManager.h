@@ -18,18 +18,26 @@ public:
 		string levelConfigFile;
 		while (ifs >> levelConfigFile) {
 			shared_ptr<Level> level = make_shared<Level>();
-			level->setBricks(levelConfigFile);
+			level->loadConfig(string(Config_Folder) + '/'+levelConfigFile);
 			levels.push_back(level);
 		}
 		currentLevel = levels.begin();
 	}
+	shared_ptr<Level> getFirstLevel();
 	shared_ptr<Level> getNextLevel();
 };
 
+shared_ptr<Level> LevelManager::getFirstLevel() {
+	currentLevel = levels.begin();
+	(*currentLevel)->resetBricks();
+	return *currentLevel;
+}
+
 shared_ptr<Level> LevelManager::getNextLevel() {
-	auto level = *currentLevel;
 	++currentLevel;
 	if (currentLevel == levels.end())
 		currentLevel = levels.begin();
+	auto level = *currentLevel;
+	level->resetBricks();
 	return level;
 }

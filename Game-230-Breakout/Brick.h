@@ -28,12 +28,12 @@ public:
 		bottomExposed(true),
 		leftExposed(true),
 		rightExposed(true){
-		setTexture(&textures[0]);
-		background.setFillColor(Color::White);
+		setFillColor(Play_Area_Color);
 	}
 	virtual pair<bool, bool> interact(Ball &ball);
 	virtual void act(Ball &ball,Paddle &paddle);
 	void setPosition(float x, float y);
+	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
 	RectangleShape getBackground() { return background; }
 	void setTopExposure(bool b) { topExposed = b; }
@@ -94,4 +94,9 @@ void Brick::act(Ball &ball, Paddle &paddle) {
 void Brick::setPosition(float x, float y) {
 	RectangleShape::setPosition(x, y);
 	background.setPosition(x, y);
+}
+
+void Brick::setDisplay() {
+	setTexture(&textures[0]);
+	background.setFillColor(Normal_Brick_Background_Color);
 }
