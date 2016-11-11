@@ -155,6 +155,7 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Breakout.h" />
     <ClInclude Include="Brick.h" />
+    <ClInclude Include="EarthBrick.h" />
     <ClInclude Include="GameConstants.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />

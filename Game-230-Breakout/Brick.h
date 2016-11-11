@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
-#include <utility>
-#include <tuple>
+#include <vector>
 #include "GameConstants.h"
 #include "Ball.h"
 #include "Paddle.h"
@@ -20,6 +19,8 @@ struct Interaction {
 class Brick :public RectangleShape {
 protected:
 	static Texture textures[];
+	RectangleShape animation;
+	vector<Texture> animationTextures;
 	RectangleShape background;
 	int durability;
 	int score;
@@ -43,7 +44,7 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball,Paddle &paddle);
+	virtual void act(Ball &ball, Paddle &paddle) {}
 	void setPosition(float x, float y);
 	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
@@ -98,15 +99,13 @@ Interaction Brick::bounce(Ball &ball) {
 			i.xPosition = brickBound.left + brickBound.width;
 		}
 		if (i.xFlip || i.yFlip) {
-			//durability = 0;
-			//setTexture(nullptr);
 			if (i.xFlip&&i.yFlip) {
 				i.xFlip = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height);
 				i.yFlip = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
 				if (!i.xFlip)
-					i.xFlip = ballBound.left;
+					i.xPosition = ballBound.left;
 				if (!i.yFlip)
-					i.yFlip = ballBound.top;
+					i.yPosition = ballBound.top;
 			}
 		}
 	}
@@ -131,10 +130,6 @@ Interaction Brick::interact(Ball &ball) {
 		}
 	}		
 	return i;
-}
-
-void Brick::act(Ball &ball, Paddle &paddle) {
-
 }
 
 void Brick::setPosition(float x, float y) {

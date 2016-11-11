@@ -222,7 +222,7 @@ void Breakout::startGame() {
 				if (endBufferTime == Refresh_Frequency * 3) {
 					nextLevel();
 				}
-				if (endBufferTime == Game_End_Buffer_Time) {
+				if (endBufferTime == Refresh_Frequency * 4) {
 					levelEnd = false;
 					levelStart = true;
 					blackCurtain.setPosition(Play_Area_X_Position, Play_Area_Height / 2 - Black_Curtain_Initial_Height / 2);

@@ -2,7 +2,6 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <fstream>
-#include <utility>
 #include <vector>
 #include <memory>
 #include <string>
