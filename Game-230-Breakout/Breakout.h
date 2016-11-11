@@ -97,7 +97,6 @@ void Breakout::resetPlayer() {
 
 void Breakout::resetGame() {
 	resetPlayer();
-	levelEnd = false;
 	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
 	player.resetScore();
@@ -107,7 +106,6 @@ void Breakout::resetGame() {
 
 void Breakout::nextLevel() {
 	resetPlayer();
-	levelEnd = false;
 	currentLevel = levelManager.getNextLevel();
 	player.setPowerUpType(Element::Normal);
 }
@@ -126,7 +124,7 @@ void Breakout::startGame() {
 				moveLeft = true;
 			if (Keyboard::isKeyPressed(Keyboard::Right)&& gameStart)
 				moveRight = true;
-			if (Keyboard::isKeyPressed(Keyboard::Space) && !gameStart) {
+			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart) {
 				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
 				ball.setXSpeed(initialBallXSpeed);
 				ball.setYSpeed(Ball_Initial_Speed);
@@ -186,19 +184,49 @@ void Breakout::startGame() {
 				if (moveRight)
 					player.moveRight();
 				player.interact(ball);
-				currentLevel->interact(ball);
+				int s = currentLevel->interact(ball);
+				if (s > 0) {
+					player.scorePoint(s);
+					ostringstream ss;
+					ss << "Score: " << player.getScore();
+					score.setString(ss.str());
+				}				
 				if (currentLevel->allClear()) {
-					endBufferTime = Game_End_Buffer_Time;
+					endBufferTime = 0;
 					moveLeft = false, moveRight = false;
-					gameStart=false,levelEnd = true;
-					message.setString("All Clear");
+					gameStart = false, levelEnd = true;
 				}
 			}
 			else {
-				--endBufferTime;
-				if (endBufferTime == 0) {
-					nextLevel();
+				++endBufferTime;
+				if (endBufferTime <= Refresh_Frequency * 2) {
+					message.setString("All Clear");
+				}
+				else if (endBufferTime <= Refresh_Frequency / 2 * 5) {
 					message.setString("");
+					float y = blackCurtain.getSize().y;
+					float x = Play_Area_Width / (Refresh_Frequency / 2)*(endBufferTime-Refresh_Frequency*2);
+					blackCurtain.setSize(Vector2f(x, y));
+				}
+				else if (endBufferTime <= Refresh_Frequency * 3) {
+					float x = blackCurtain.getSize().x;
+					float y = (Play_Area_Height - Black_Curtain_Initial_Height) / Refresh_Frequency*(endBufferTime - Refresh_Frequency /2*5) * 2 + Black_Curtain_Initial_Height;
+					blackCurtain.setSize(Vector2f(x, y));
+					blackCurtain.setPosition(blackCurtain.getPosition().x, Play_Area_Height / 2 - blackCurtain.getSize().y / 2);
+				}
+				else if (endBufferTime <= Refresh_Frequency * 4) {
+					float x= Play_Area_Width / Refresh_Frequency *(Refresh_Frequency * 4-endBufferTime);
+					float y = blackCurtain.getSize().y;
+					blackCurtain.setSize(Vector2f(x, y));
+				}
+				if (endBufferTime == Refresh_Frequency * 3) {
+					nextLevel();
+				}
+				if (endBufferTime == Game_End_Buffer_Time) {
+					levelEnd = false;
+					levelStart = true;
+					blackCurtain.setPosition(Play_Area_X_Position, Play_Area_Height / 2 - Black_Curtain_Initial_Height / 2);
+					blackCurtain.setSize(Vector2f(0, Black_Curtain_Initial_Height));
 				}
 			}
 		}
@@ -212,6 +240,8 @@ void Breakout::startGame() {
 			window.draw(blackCurtain);
 			window.draw(levelName);
 		}
+		if (levelEnd)
+			window.draw(blackCurtain);
 		window.draw(statArea);
 		window.draw(score);
 		window.draw(lives);

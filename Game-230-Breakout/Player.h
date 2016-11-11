@@ -32,7 +32,7 @@ public:
 	void setPaddleColor(Color c) { paddle.setFillColor(c); }
 	void setPaddlePosition(float x, float y) { paddle.setPosition(x, y); }
 	void resetScore() { score = 0; }
-	void scorePoint() { score += 1; }
+	void scorePoint(int s) { score += s; }
 	int getScore() { return score; }
 	void lostLife() { --life; }
 	int getLives() { return life; }

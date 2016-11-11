@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include <utility>
+#include <tuple>
 #include "GameConstants.h"
 #include "Ball.h"
 #include "Paddle.h"
@@ -8,14 +9,23 @@
 using namespace sf;
 using namespace std;
 
+struct Interaction {
+	bool xFlip;
+	bool yFlip;
+	float xPosition;
+	float yPosition;
+	int score;
+};
+
 class Brick :public RectangleShape {
 protected:
 	static Texture textures[];
 	RectangleShape background;
 	int durability;
 	int score;
-	bool isEmpty,waterUpgraded, earthUpgraded, windUpgraded;
+	bool isEmpty,waterUpgraded, earthUpgraded, windUpgraded,nullUpgraded;
 	bool topExposed, bottomExposed, leftExposed, rightExposed;
+	Interaction bounce(Ball &ball);
 public:
 	Brick(float x, float y,int d,int s,bool e=false) :RectangleShape(Vector2f(x, y)),
 		background(Vector2f(x,y)),
@@ -25,13 +35,14 @@ public:
 		waterUpgraded(false),
 		earthUpgraded(false),
 		windUpgraded(false),
+		nullUpgraded(false),
 		topExposed(true),
 		bottomExposed(true),
 		leftExposed(true),
 		rightExposed(true){
 		setFillColor(Play_Area_Color);
 	}
-	virtual pair<bool, bool> interact(Ball &ball);
+	virtual Interaction interact(Ball &ball);
 	virtual void act(Ball &ball,Paddle &paddle);
 	void setPosition(float x, float y);
 	virtual void setDisplay();
@@ -56,38 +67,70 @@ void Brick::loadTextures() {
 	textures[3].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 3.png");
 }
 
-pair<bool,bool> Brick::interact(Ball &ball) {
+Interaction Brick::bounce(Ball &ball) {
 	FloatRect ballBound = ball.getGlobalBounds();
 	FloatRect brickBound = getGlobalBounds();
-	bool flipX = false, flipY = false;
+	Interaction i;
+	i.xFlip = false;
+	i.yFlip = false;
+	i.xPosition = ballBound.left;
+	i.yPosition = ballBound.top;
+	i.score = 0;
 	if (durability > 0) {
 		if (ball.getVelocity().y > 0 && topExposed &&
 			(brickBound.contains(ballBound.left, ballBound.top + ballBound.height) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height))) {
-			flipY = true;
+			i.yFlip = true;
+			i.yPosition = brickBound.top - ballBound.height;
 		}
 		if (ball.getVelocity().y < 0 && bottomExposed &&
 			(brickBound.contains(ballBound.left, ballBound.top) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top))) {
-			flipY = true;
+			i.yFlip = true;
+			i.yPosition = brickBound.top + brickBound.height;
 		}
 		if (ball.getVelocity().x>0 && leftExposed &&
 			(brickBound.contains(ballBound.left + ballBound.width, ballBound.top) || brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height))) {
-			flipX = true;
+			i.xFlip = true;
+			i.xPosition = brickBound.left - ballBound.width;
 		}
 		if (ball.getVelocity().x<0 && rightExposed &&
 			(brickBound.contains(ballBound.left, ballBound.top) || brickBound.contains(ballBound.left, ballBound.top + ballBound.height))) {
-			flipX = true;
+			i.xFlip = true;
+			i.xPosition = brickBound.left + brickBound.width;
 		}
-		if (flipX||flipY) {
-			durability = 0;
-			setTexture(nullptr);
-			if (flipX&&flipY) {
-				flipX = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height); 
-				flipY = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
+		if (i.xFlip || i.yFlip) {
+			//durability = 0;
+			//setTexture(nullptr);
+			if (i.xFlip&&i.yFlip) {
+				i.xFlip = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height);
+				i.yFlip = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
+				if (!i.xFlip)
+					i.xFlip = ballBound.left;
+				if (!i.yFlip)
+					i.yFlip = ballBound.top;
 			}
 		}
 	}
-	
-	return pair<bool,bool>(flipX,flipY);
+	return i;
+}
+Interaction Brick::interact(Ball &ball) {
+ 	Interaction i = bounce(ball);
+	int damage=0;
+	if (i.xFlip || i.yFlip) {
+		int damage = durability;
+		if (waterUpgraded)
+			damage /= 2;
+		if (earthUpgraded)
+			damage /= 2;
+		if (windUpgraded)
+			damage /= 2;
+		durability -= damage;
+		if (durability <= 0) {
+			durability = 0;
+			setTexture(nullptr);
+			i.score = score;
+		}
+	}		
+	return i;
 }
 
 void Brick::act(Ball &ball, Paddle &paddle) {

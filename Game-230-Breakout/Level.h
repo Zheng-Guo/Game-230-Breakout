@@ -91,20 +91,28 @@ void Level::resetBricks() {
 }
 
 int Level::interact(Ball &ball) {
-	float xSpeed=ball.getVelocity().x, ySpeed=ball.getVelocity().y;
+	float xSpeed=ball.getVelocity().x, ySpeed=ball.getVelocity().y,xPosition=ball.getPosition().x,yPosition=ball.getPosition().y;
+	int score=0;
 	for (shared_ptr<Brick> b : bricks) {
-		pair<bool,bool> velocityFlip=b->interact(ball);
-		if (velocityFlip.first)
+		Interaction i=b->interact(ball);
+		if (i.xFlip) {
 			xSpeed = -ball.getVelocity().x;
-		if (velocityFlip.second)
+			xPosition = i.xPosition;
+		}
+		if (i.yFlip) {
 			ySpeed = -ball.getVelocity().y;
-		if (velocityFlip.first || velocityFlip.second)
+			yPosition = i.yPosition;
+		}
+		if (i.score > 0) {
+			score += i.score;
 			--numberOfBricks;
+		}			
 	}
 	ball.setXSpeed(xSpeed);
 	ball.setYSpeed(ySpeed);
+	ball.setPosition(xPosition, yPosition);
 	setEdgeExposure();
-	return 1;
+	return score;
 }
 
 void Level::render(RenderWindow &window) {
