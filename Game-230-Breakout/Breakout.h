@@ -27,7 +27,7 @@ private:
 	shared_ptr<Level> currentLevel;
 	Player player;
 	Ball ball;
-	Text score, lives,message,levelName;
+	Text score, lives,message,levelName,restartInstruction;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
@@ -80,6 +80,11 @@ public:
 		levelName.setCharacterSize(Level_Name_Character_Size);
 		levelName.setFillColor(Color::White);
 		levelName.setPosition(Level_Name_X_Position,Level_Name_Y_Position);
+		restartInstruction.setString("Press Space to restart the game.");
+		restartInstruction.setFont(font);
+		restartInstruction.setCharacterSize(Stat_Character_Size);
+		restartInstruction.setFillColor(Color::Red);
+		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
 	}
@@ -102,6 +107,12 @@ void Breakout::resetGame() {
 	player.resetScore();
 	player.resetLives();
 	player.setPowerUpType(Element::Normal);
+	ostringstream ss;
+	ss << "Score: " << player.getScore();
+	score.setString(ss.str());
+	ss.str("");
+	ss << "Lives: " << player.getLives();
+	lives.setString(ss.str());
 }
 
 void Breakout::nextLevel() {
@@ -130,10 +141,15 @@ void Breakout::startGame() {
 				ball.setYSpeed(Ball_Initial_Speed);
 				gameStart = true;
 			}
+			if (Keyboard::isKeyPressed(Keyboard::Space) && gameOver) {
+				message.setString("");
+				resetGame();
+				levelStart = true;
+			}
 		}
 		time2 = clock.getElapsedTime();
 		time3 = time2 - time1;
-		if (time3.asSeconds() >= Refresh_Interval) {
+		if (time3.asSeconds() >= Refresh_Interval&&!gameOver) {
 			time1 = time2;
 			if (levelStart) {
 				++startBufferTime;
@@ -174,10 +190,16 @@ void Breakout::startGame() {
 				if (i == 1) {
 					player.lostLife();
 					moveLeft = false, moveRight = false;
-					resetPlayer();
-					ostringstream ss;
-					ss << "Lives: " << player.getLives();
-					lives.setString(ss.str());
+					if (player.getLives() >= 1) {
+						resetPlayer();
+						ostringstream ss;
+						ss << "Lives: " << player.getLives();
+						lives.setString(ss.str());
+					}
+					else {
+						message.setString("Game Over");
+						gameOver = true;
+					}
 				}
 				if (moveLeft)
 					player.moveLeft();
@@ -242,6 +264,8 @@ void Breakout::startGame() {
 		}
 		if (levelEnd)
 			window.draw(blackCurtain);
+		if (gameOver) 
+			window.draw(restartInstruction);
 		window.draw(statArea);
 		window.draw(score);
 		window.draw(lives);
