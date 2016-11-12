@@ -27,6 +27,7 @@ public:
 	void loadConfig(string fileName);
 	void resetBricks();
 	int interact(Ball &ball);
+	void act(Ball &ball, Paddle &paddle);
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
 	string getLevelName() { return levelName; }
@@ -115,6 +116,12 @@ int Level::interact(Ball &ball) {
 	ball.setPosition(xPosition, yPosition);
 	setEdgeExposure();
 	return score;
+}
+
+void Level::act(Ball &ball, Paddle &paddle) {
+	for (shared_ptr<Brick> b : bricks) {
+		b->act(bricks, ball, paddle);
+	}
 }
 
 void Level::render(RenderWindow &window) {

@@ -46,10 +46,11 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(vector<vector<shared_ptr<Brick>>> &brickGrid,Ball &ball, Paddle &paddle) {}
+	virtual void act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle) {}
 	void setPosition(float x, float y);
 	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
+	void setAnimation(Color c) { animation.setFillColor(c); }
 	RectangleShape getBackground() { return background; }
 	RectangleShape getAnimation() { return animation; }
 	void setTopExposure(bool b) { topExposed = b; }
@@ -59,6 +60,8 @@ public:
 	void setDurability(int d) { durability = d; }
 	bool isBroken() { return durability == 0; }
 	bool isBrickEmpty() { return isEmpty; }
+	virtual bool isNormal() { return true; }
+	void setEarthUpgrade(bool b) { earthUpgraded = b; }
 	static void loadTextures();
 };
 
@@ -101,15 +104,13 @@ Interaction Brick::bounce(Ball &ball) {
 			i.xFlip = true;
 			i.xPosition = brickBound.left + brickBound.width;
 		}
-		if (i.xFlip || i.yFlip) {
-			if (i.xFlip&&i.yFlip) {
-				i.xFlip = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height);
-				i.yFlip = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
-				if (!i.xFlip)
-					i.xPosition = ballBound.left;
-				if (!i.yFlip)
-					i.yPosition = ballBound.top;
-			}
+		if (i.xFlip&&i.yFlip) {
+			i.xFlip = !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top) && !brickBound.contains(ballBound.left + ballBound.width / 2, ballBound.top + ballBound.height);
+			i.yFlip = !brickBound.contains(ballBound.left + ballBound.width, ballBound.top + ballBound.height / 2) && !brickBound.contains(ballBound.left, ballBound.top + ballBound.height / 2);
+			if (!i.xFlip)
+				i.xPosition = ballBound.left;
+			if (!i.yFlip)
+				i.yPosition = ballBound.top;
 		}
 	}
 	return i;
@@ -118,7 +119,7 @@ Interaction Brick::interact(Ball &ball) {
  	Interaction i = bounce(ball);
 	int damage=0;
 	if (i.xFlip || i.yFlip) {
-		int damage = durability;
+		int damage = Brick_Duribility;
 		if (waterUpgraded)
 			damage /= 2;
 		if (earthUpgraded)
@@ -126,12 +127,20 @@ Interaction Brick::interact(Ball &ball) {
 		if (windUpgraded)
 			damage /= 2;
 		durability -= damage;
-		if (durability <= 0) {
+		if (durability > Brick_Duribility / 4 * 3)
+			setTexture(&textures[0]);
+		else if (durability > Brick_Duribility / 2)
+			setTexture(&textures[1]);
+		else if (durability > Brick_Duribility / 4)
+			setTexture(&textures[2]);
+		else if (durability >0)
+			setTexture(&textures[3]);
+		else {
 			durability = 0;
 			setTexture(nullptr);
 			i.score = score;
 		}
-	}		
+	}
 	return i;
 }
 

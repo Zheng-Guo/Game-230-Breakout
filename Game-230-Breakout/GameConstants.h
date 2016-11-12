@@ -49,4 +49,7 @@ const char Animation_Thunder_Subfolder[] = "thunder";
 const char Audio_Folder[] = "audio";
 const Color Play_Area_Color = Color::Green;
 const Color Normal_Brick_Background_Color = Color::White;
+const Color Fire_Brick_Background_Color = Color::Red;
+const Color Thunder_Brick_Background_Color = Color(255, 63, 255);
+const Color Earth_Upgraded_Background_Color = Color(83, 41, 0);
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};

@@ -91,6 +91,7 @@ public:
 		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
+		currentLevel->act(ball, player.getPaddle());
 	}
 	void startGame();
 };
@@ -108,6 +109,7 @@ void Breakout::resetGame() {
 	resetPlayer();
 	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
+	currentLevel->act(ball, player.getPaddle());
 	player.resetScore();
 	player.resetLives();
 	player.setPowerUpType(Element::Normal);
@@ -122,6 +124,7 @@ void Breakout::resetGame() {
 void Breakout::nextLevel() {
 	resetPlayer();
 	currentLevel = levelManager.getNextLevel();
+	currentLevel->act(ball, player.getPaddle());
 	player.setPowerUpType(Element::Normal);
 }
 
@@ -231,6 +234,7 @@ void Breakout::startGame() {
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
 				}
+				currentLevel->act(ball, player.getPaddle());
 			}
 			else {
 				++endBufferTime;
