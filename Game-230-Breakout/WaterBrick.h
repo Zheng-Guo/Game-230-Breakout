@@ -96,16 +96,16 @@ void WaterBrick::upgradeBricks(bool upgrade) {
 			if (upgrade) {
 				b->setWaterUpgrade(true);
 				if (b->getEarthUpgrade())
-					b->setAnimation(Due_Upgraded_Background_Color);
+					b->setBackground(Due_Upgraded_Background_Color);
 				else
-					b->setAnimation(Water_Upgraded_Background_Color);
+					b->setBackground(Water_Upgraded_Background_Color);
 			}
 			else {
 				b->setWaterUpgrade(false);
 				if (b->getEarthUpgrade())
-					b->setAnimation(Earth_Upgraded_Background_Color);
+					b->setBackground(Earth_Upgraded_Background_Color);
 				else
-					b->setAnimation(Normal_Brick_Background_Color);
+					b->setBackground(Normal_Brick_Background_Color);
 			}
 		}
 	}

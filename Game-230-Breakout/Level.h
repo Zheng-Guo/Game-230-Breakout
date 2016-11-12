@@ -72,6 +72,7 @@ void Level::loadConfig(string fileName) {
 		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
+		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
 		bricks.push_back(brick);
@@ -87,8 +88,6 @@ void Level::loadConfig(string fileName) {
 		}
 		brickGrid.push_back(brickRow);
 	}
-	for (shared_ptr<Brick> b : bricks)
-		b->upgradeBricks(true);
 	setEdgeExposure();
 }
 
@@ -97,6 +96,8 @@ void Level::resetBricks() {
 	for (shared_ptr<Brick> b : bricks) {
 		b->setDisplay();
 	}
+	for (shared_ptr<Brick> b : bricks)
+		b->upgradeBricks(true);
 }
 
 int Level::interact(Ball &ball) {
@@ -135,7 +136,8 @@ void Level::render(RenderWindow &window) {
 		window.draw(b->getBackground());
 	}
 	for (shared_ptr<Brick> b : bricks) {
-		window.draw(b->getAnimation());
+		if(!b->isNormal()&&!b->isBroken())
+			window.draw(b->getAnimation());
 	}
 	for (shared_ptr<Brick> b : bricks) {
 		window.draw(*b);

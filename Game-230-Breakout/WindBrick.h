@@ -29,7 +29,7 @@ public:
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual void act(Ball &ball, Paddle &paddle);
-	virtual void upgradeBricks(bool upgrade) {};
+	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 	virtual void setPosition(float x, float y);
@@ -37,6 +37,13 @@ public:
 
 Interaction WindBrick::interact(Ball &ball) {
 	Interaction i = bounce(ball);
+	float newXSpeed, newYSpeed;
+	float deltaSpeed = (rand() % 3 + 1) / 10.0;
+	newXSpeed = ball.getVelocity().x > 0 ? ball.getVelocity().x + deltaSpeed : ball.getVelocity().x - deltaSpeed;
+	deltaSpeed = (rand() % 3 + 1) / 10.0;
+	newYSpeed = ball.getVelocity().y > 0 ? ball.getVelocity().y + deltaSpeed : ball.getVelocity().y - deltaSpeed;
+	ball.setXSpeed(newXSpeed);
+	ball.setYSpeed(newYSpeed);
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility / 4;
@@ -54,6 +61,7 @@ Interaction WindBrick::interact(Ball &ball) {
 		else {
 			durability = 0;
 			setTexture(nullptr);
+			animation.setTexture(nullptr);
 			i.score = score;
 			upgradeBricks(false);
 		}
@@ -68,6 +76,21 @@ void WindBrick::act(Ball &ball, Paddle &paddle) {
 	else {
 		refreshCounter = 0;
 		animation.rotate(30);
+	}
+}
+
+void WindBrick::upgradeBricks(bool upgrade) {
+	for (shared_ptr<Brick> b : bricks) {
+		if (b->isNormal() && 
+			b->getPosition().x>=getPosition().x-Brick_Width&&b->getPosition().x<=getPosition().x +Brick_Width&&
+			b->getPosition().y>=getPosition().y-Brick_Height&&b->getPosition().y<=getPosition().y+Brick_Height) {
+			if (upgrade) {
+				b->setWindUpgrade(true);
+			}
+			else {
+				b->setWindUpgrade(false);
+			}
+		}
 	}
 }
 

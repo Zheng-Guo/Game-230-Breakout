@@ -2,6 +2,8 @@
 #include <SFML\Graphics.hpp>
 #include <vector>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 #include "GameConstants.h"
 #include "Ball.h"
 #include "Paddle.h"
@@ -43,6 +45,7 @@ public:
 		bottomExposed(true),
 		leftExposed(true),
 		rightExposed(true){
+		srand(time(NULL));
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
@@ -66,6 +69,8 @@ public:
 	bool getEarthUpgrade() { return earthUpgraded; }
 	void setWaterUpgrade(bool b) { waterUpgraded = b; }
 	bool getWaterUpgrade() { return waterUpgraded; }
+	void setWindUpgrade(bool b) { windUpgraded = b; }
+	bool getWindUpgrade() { return windUpgraded; }
 	static void loadTextures();
 };
 
@@ -121,6 +126,15 @@ Interaction Brick::bounce(Ball &ball) {
 }
 Interaction Brick::interact(Ball &ball) {
  	Interaction i = bounce(ball);
+	if (windUpgraded) {
+		float newXSpeed, newYSpeed;
+		float deltaSpeed = (rand() % 3 + 1) / 50.0;
+		newXSpeed = ball.getVelocity().x > 0 ? ball.getVelocity().x + deltaSpeed : ball.getVelocity().x - deltaSpeed;
+		deltaSpeed = (rand() % 3 + 1) / 50.0;
+		newYSpeed = ball.getVelocity().y > 0 ? ball.getVelocity().y + deltaSpeed : ball.getVelocity().y - deltaSpeed;
+		ball.setXSpeed(newXSpeed);
+		ball.setYSpeed(newYSpeed);			
+	}
 	int damage=0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility;
