@@ -9,6 +9,7 @@
 #include "Brick.h"
 #include "EarthBrick.h"
 #include "WaterBrick.h"
+#include "WindBrick.h"
 
 using namespace std;
 using namespace sf;
@@ -70,6 +71,7 @@ void Level::loadConfig(string fileName) {
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
 		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
+		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
 		bricks.push_back(brick);
@@ -124,7 +126,7 @@ int Level::interact(Ball &ball) {
 
 void Level::act(Ball &ball, Paddle &paddle) {
 	for (shared_ptr<Brick> b : bricks) {
-		b->act(bricks, ball, paddle);
+		b->act( ball, paddle);
 	}
 }
 

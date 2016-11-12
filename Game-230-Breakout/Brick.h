@@ -46,9 +46,9 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle) {}
+	virtual void act(Ball &ball, Paddle &paddle) {}
 	virtual void upgradeBricks(bool b) {}
-	void setPosition(float x, float y);
+	virtual void setPosition(float x, float y);
 	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
 	void setAnimation(Color c) { animation.setFillColor(c); }

@@ -21,7 +21,7 @@ public:
 		animation.setTexture(&animationTextures[0]);		
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle);
+	virtual void act(Ball &ball, Paddle &paddle);
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -33,10 +33,6 @@ Interaction EarthBrick::interact(Ball &ball) {
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility/4;
 		if (waterUpgraded)
-			damage /= 2;
-		if (earthUpgraded)
-			damage /= 2;
-		if (windUpgraded)
 			damage /= 2;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
@@ -57,7 +53,7 @@ Interaction EarthBrick::interact(Ball &ball) {
 	return i;
 }
 
-void EarthBrick::act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle) {
+void EarthBrick::act(Ball &ball, Paddle &paddle) {
 /*	for (shared_ptr<Brick> b : bricks) {
 		if (b->isNormal()&& getPosition().y == b->getPosition().y) {
 			if (durability > 0) {
