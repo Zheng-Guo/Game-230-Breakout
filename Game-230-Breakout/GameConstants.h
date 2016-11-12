@@ -55,4 +55,5 @@ const Color Earth_Upgraded_Background_Color = Color(83, 41, 0);
 const Color Water_Upgraded_Background_Color = Color(0, 0, 255);
 const Color Due_Upgraded_Background_Color = Color(53, 74, 123);
 const int Water_Texture_Number = 16;
+const int Fire_Texture_Number = 21;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};

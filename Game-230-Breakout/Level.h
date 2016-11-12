@@ -10,6 +10,7 @@
 #include "EarthBrick.h"
 #include "WaterBrick.h"
 #include "WindBrick.h"
+#include "FireBrick.h"
 
 using namespace std;
 using namespace sf;
@@ -70,6 +71,7 @@ void Level::loadConfig(string fileName) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
 		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
+		case Element::Fire:brick= make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
