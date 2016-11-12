@@ -62,6 +62,7 @@ public:
 	bool isBrickEmpty() { return isEmpty; }
 	virtual bool isNormal() { return true; }
 	void setEarthUpgrade(bool b) { earthUpgraded = b; }
+	void setWaterUpgrade(bool b) { waterUpgraded = b; }
 	static void loadTextures();
 };
 

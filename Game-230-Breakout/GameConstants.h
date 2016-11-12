@@ -52,4 +52,6 @@ const Color Normal_Brick_Background_Color = Color::White;
 const Color Fire_Brick_Background_Color = Color::Red;
 const Color Thunder_Brick_Background_Color = Color(255, 63, 255);
 const Color Earth_Upgraded_Background_Color = Color(83, 41, 0);
+const Color Water_Upgraded_Background_Color = Color(0, 0, 255);
+const int Water_Texture_Number = 16;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};

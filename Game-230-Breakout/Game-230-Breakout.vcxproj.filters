@@ -53,5 +53,8 @@
     <ClInclude Include="EarthBrick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WaterBrick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

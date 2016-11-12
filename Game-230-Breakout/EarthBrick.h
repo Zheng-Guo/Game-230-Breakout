@@ -10,11 +10,8 @@ using namespace sf;
 using namespace std;
 
 class EarthBrick :public Brick {
-private:
-	bool nullUpgraded;
 public:
-	EarthBrick(float x, float y, int d, int s, bool e = false):Brick(x,y,d,s),
-		nullUpgraded(false){
+	EarthBrick(float x, float y, int d, int s, bool e = false):Brick(x,y,d,s){
 		Texture texture;
 		texture.loadFromFile(string(Texture_Folder)+'/'+Texture_Brick_Subfolder+'/'+"earth.png");
 		animationTextures.push_back(texture);

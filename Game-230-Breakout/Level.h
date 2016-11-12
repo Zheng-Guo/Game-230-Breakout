@@ -8,6 +8,7 @@
 #include "GameConstants.h"
 #include "Brick.h"
 #include "EarthBrick.h"
+#include "WaterBrick.h"
 
 using namespace std;
 using namespace sf;
@@ -67,6 +68,7 @@ void Level::loadConfig(string fileName) {
 		switch (brickType) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
+		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20); break;
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20); break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
