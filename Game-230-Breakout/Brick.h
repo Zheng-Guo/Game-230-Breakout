@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include <vector>
+#include <memory>
 #include "GameConstants.h"
 #include "Ball.h"
 #include "Paddle.h"
@@ -29,6 +30,7 @@ protected:
 	Interaction bounce(Ball &ball);
 public:
 	Brick(float x, float y,int d,int s,bool e=false) :RectangleShape(Vector2f(x, y)),
+		animation(Vector2f(x,y)),
 		background(Vector2f(x,y)),
 		durability(d),
 		score(s),
@@ -44,11 +46,12 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle) {}
+	virtual void act(vector<vector<shared_ptr<Brick>>> &brickGrid,Ball &ball, Paddle &paddle) {}
 	void setPosition(float x, float y);
 	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
 	RectangleShape getBackground() { return background; }
+	RectangleShape getAnimation() { return animation; }
 	void setTopExposure(bool b) { topExposed = b; }
 	void setBottomExposure(bool b) { bottomExposed = b; }
 	void setLeftExposure(bool b) { leftExposed = b; }
@@ -134,6 +137,7 @@ Interaction Brick::interact(Ball &ball) {
 
 void Brick::setPosition(float x, float y) {
 	RectangleShape::setPosition(x, y);
+	animation.setPosition(x, y);
 	background.setPosition(x, y);
 }
 
