@@ -68,8 +68,8 @@ void Level::loadConfig(string fileName) {
 		switch (brickType) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
-		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20); break;
-		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20); break;
+		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
+		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
 		bricks.push_back(brick);
@@ -85,6 +85,8 @@ void Level::loadConfig(string fileName) {
 		}
 		brickGrid.push_back(brickRow);
 	}
+	for (shared_ptr<Brick> b : bricks)
+		b->upgradeBricks(true);
 	setEdgeExposure();
 }
 

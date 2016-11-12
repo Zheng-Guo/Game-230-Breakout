@@ -47,6 +47,7 @@ public:
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual void act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle) {}
+	virtual void upgradeBricks(bool b) {}
 	void setPosition(float x, float y);
 	virtual void setDisplay();
 	void setBackground(Color c) { background.setFillColor(c); }
@@ -62,7 +63,9 @@ public:
 	bool isBrickEmpty() { return isEmpty; }
 	virtual bool isNormal() { return true; }
 	void setEarthUpgrade(bool b) { earthUpgraded = b; }
+	bool getEarthUpgrade() { return earthUpgraded; }
 	void setWaterUpgrade(bool b) { waterUpgraded = b; }
+	bool getWaterUpgrade() { return waterUpgraded; }
 	static void loadTextures();
 };
 

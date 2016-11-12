@@ -10,8 +10,11 @@ using namespace sf;
 using namespace std;
 
 class EarthBrick :public Brick {
+private:
+	vector<shared_ptr<Brick>> &bricks;
 public:
-	EarthBrick(float x, float y, int d, int s, bool e = false):Brick(x,y,d,s){
+	EarthBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b,bool e = false):Brick(x,y,d,s),
+	bricks(b){
 		Texture texture;
 		texture.loadFromFile(string(Texture_Folder)+'/'+Texture_Brick_Subfolder+'/'+"earth.png");
 		animationTextures.push_back(texture);
@@ -19,6 +22,7 @@ public:
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual void act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle);
+	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 };
@@ -47,13 +51,14 @@ Interaction EarthBrick::interact(Ball &ball) {
 			durability = 0;
 			setTexture(nullptr);
 			i.score = score;
+			upgradeBricks(false);
 		}
 	}
 	return i;
 }
 
 void EarthBrick::act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddle) {
-	for (shared_ptr<Brick> b : bricks) {
+/*	for (shared_ptr<Brick> b : bricks) {
 		if (b->isNormal()&& getPosition().y == b->getPosition().y) {
 			if (durability > 0) {
 				b->setEarthUpgrade(true);
@@ -64,9 +69,29 @@ void EarthBrick::act(vector<shared_ptr<Brick>> &bricks,Ball &ball, Paddle &paddl
 				b->setAnimation(Normal_Brick_Background_Color);
 			}
 		}
-	}
+	}*/
 }
 
+void EarthBrick::upgradeBricks(bool upgrade) {
+	for (shared_ptr<Brick> b : bricks) {
+		if (b->isNormal() && getPosition().y == b->getPosition().y) {
+			if (upgrade) {
+				b->setEarthUpgrade(true);
+				if (b->getWaterUpgrade())
+					b->setAnimation(Due_Upgraded_Background_Color);
+				else
+					b->setAnimation(Earth_Upgraded_Background_Color);
+			}
+			else {
+				b->setEarthUpgrade(false);
+				if (b->getWaterUpgrade())
+					b->setAnimation(Water_Upgraded_Background_Color);
+				else
+					b->setAnimation(Normal_Brick_Background_Color);
+			}
+		}
+	}
+}
 void EarthBrick::setDisplay() {
 	if (!isEmpty) {
 		durability = Brick_Duribility;

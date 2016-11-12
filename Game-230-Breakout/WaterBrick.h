@@ -12,9 +12,15 @@ using namespace std;
 
 class WaterBrick :public Brick {
 private:
+	vector<shared_ptr<Brick>> &bricks;
+	const int animationRefreshRate;
+	int refreshCounter;
 	vector<Texture>::iterator currentTexture;
 public:
-	WaterBrick(float x, float y, int d, int s, bool e = false) :Brick(x, y, d, s) {
+	WaterBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b,bool e = false) :Brick(x, y, d, s),
+		bricks(b),
+	animationRefreshRate(Refresh_Frequency/10),
+	refreshCounter(0){
 		Texture texture;
 		ostringstream ss;
 		for (int i = 1; i <= Water_Texture_Number; i++) {
@@ -28,6 +34,7 @@ public:
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual void act(vector<shared_ptr<Brick>> &bricks, Ball &ball, Paddle &paddle);
+	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 };
@@ -56,16 +63,23 @@ Interaction WaterBrick::interact(Ball &ball) {
 			durability = 0;
 			setTexture(nullptr);
 			i.score = score;
+			upgradeBricks(false);
 		}
 	}
 	return i;
 }
 
 void WaterBrick::act(vector<shared_ptr<Brick>> &bricks, Ball &ball, Paddle &paddle) {
-	currentTexture++;
-	if (currentTexture == animationTextures.end())
-		currentTexture = animationTextures.begin();
-	animation.setTexture(&(*currentTexture));
+	if (refreshCounter < animationRefreshRate) {
+		++refreshCounter;
+	}
+	else {
+		refreshCounter = 0;
+		currentTexture++;
+		if (currentTexture == animationTextures.end())
+			currentTexture = animationTextures.begin();
+		animation.setTexture(&(*currentTexture));
+	}/*
 	for (shared_ptr<Brick> b : bricks) {
 		if (b->isNormal() && getPosition().x == b->getPosition().x) {
 			if (durability > 0) {
@@ -75,6 +89,27 @@ void WaterBrick::act(vector<shared_ptr<Brick>> &bricks, Ball &ball, Paddle &padd
 			else {
 				b->setWaterUpgrade(false);
 				b->setAnimation(Normal_Brick_Background_Color);
+			}
+		}
+	}*/
+}
+
+void WaterBrick::upgradeBricks(bool upgrade) {
+	for (shared_ptr<Brick> b : bricks) {
+		if (b->isNormal() && getPosition().x == b->getPosition().x) {
+			if (upgrade) {
+				b->setWaterUpgrade(true);
+				if (b->getEarthUpgrade())
+					b->setAnimation(Due_Upgraded_Background_Color);
+				else
+					b->setAnimation(Water_Upgraded_Background_Color);
+			}
+			else {
+				b->setWaterUpgrade(false);
+				if (b->getEarthUpgrade())
+					b->setAnimation(Earth_Upgraded_Background_Color);
+				else
+					b->setAnimation(Normal_Brick_Background_Color);
 			}
 		}
 	}
