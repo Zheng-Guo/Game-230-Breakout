@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include "GameConstants.h"
+#include "Player.h"
 #include "Brick.h"
 #include "EarthBrick.h"
 #include "WaterBrick.h"
@@ -21,6 +22,7 @@ private:
 	vector<int> brickConfig;
 	vector<shared_ptr<Brick>> bricks;
 	vector<vector<shared_ptr<Brick>>> brickGrid;
+	vector<shared_ptr<FireBall>> fireballs;
 	string levelName;
 	int initialNumberOfBricks;
 	int numberOfBricks;
@@ -30,7 +32,7 @@ public:
 	void loadConfig(string fileName);
 	void resetBricks();
 	int interact(Ball &ball);
-	void act(Ball &ball, Paddle &paddle);
+	void act(Player &p);
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
 	string getLevelName() { return levelName; }
@@ -65,13 +67,14 @@ void Level::loadConfig(string fileName) {
 	ifstream ifs(fileName);
 	getline(ifs,levelName);
 	int brickType;
+	shared_ptr<FireBrick> b;
 	while (ifs >> brickType) {
 		shared_ptr<Brick> brick;
 		switch (brickType) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
 		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
-		case Element::Fire:brick= make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
+		case Element::Fire:b = make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); fireballs.push_back(b->getFireball()); brick = b; break;
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
@@ -127,9 +130,9 @@ int Level::interact(Ball &ball) {
 	return score;
 }
 
-void Level::act(Ball &ball, Paddle &paddle) {
+void Level::act(Player &p) {
 	for (shared_ptr<Brick> b : bricks) {
-		b->act( ball, paddle);
+		b->act(p);
 	}
 }
 
@@ -143,5 +146,9 @@ void Level::render(RenderWindow &window) {
 	}
 	for (shared_ptr<Brick> b : bricks) {
 		window.draw(*b);
+	}
+	for (shared_ptr<FireBall> f : fireballs) {
+		if(f->isFired())
+			window.draw(*f);
 	}
 }

@@ -5,6 +5,7 @@
 #include <memory>
 #include "GameConstants.h"
 #include "Brick.h"
+#include "Player.h"
 
 using namespace sf;
 using namespace std;
@@ -21,7 +22,7 @@ public:
 		animation.setTexture(&animationTextures[0]);		
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle);
+	virtual void act(Player &p) {}
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -51,21 +52,6 @@ Interaction EarthBrick::interact(Ball &ball) {
 		}
 	}
 	return i;
-}
-
-void EarthBrick::act(Ball &ball, Paddle &paddle) {
-/*	for (shared_ptr<Brick> b : bricks) {
-		if (b->isNormal()&& getPosition().y == b->getPosition().y) {
-			if (durability > 0) {
-				b->setEarthUpgrade(true);
-				b->setAnimation(Earth_Upgraded_Background_Color);
-			}
-			else {
-				b->setEarthUpgrade(false);
-				b->setAnimation(Normal_Brick_Background_Color);
-			}
-		}
-	}*/
 }
 
 void EarthBrick::upgradeBricks(bool upgrade) {

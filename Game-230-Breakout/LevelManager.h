@@ -22,6 +22,7 @@ public:
 			levels.push_back(level);
 		}
 		currentLevel = levels.begin();
+		ifs.close();
 	}
 	shared_ptr<Level> getFirstLevel();
 	shared_ptr<Level> getNextLevel();

@@ -28,7 +28,7 @@ public:
 		animation.setTexture(&animationTextures[0]);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -69,7 +69,7 @@ Interaction WindBrick::interact(Ball &ball) {
 	return i;
 }
 
-void WindBrick::act(Ball &ball, Paddle &paddle) {
+void WindBrick::act(Player &p) {
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}

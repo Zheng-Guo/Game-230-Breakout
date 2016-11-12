@@ -10,17 +10,46 @@
 using namespace sf;
 using namespace std;
 
+class FireBall :public CircleShape {
+private:
+	Texture fireballTexture;
+	Vector2f velocity;
+	bool fired;
+public:
+	FireBall(float r) :CircleShape(r),
+		velocity(0, 0),
+		fired(false){
+		ostringstream ss;
+		ss.str("");
+		ss << Texture_Folder << '/' << Texture_Brick_Subfolder << "/fireball.png";
+		fireballTexture.loadFromFile(ss.str());
+		setTexture(&fireballTexture);
+	}
+	void setFired(bool b) { fired = b; }
+	bool isFired() { return fired; }
+	void setVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
+	void move() { CircleShape::move(velocity); }
+};
+
 class FireBrick :public Brick {
 private:
 	vector<shared_ptr<Brick>> &bricks;
 	const int animationRefreshRate;
 	int refreshCounter;
 	vector<Texture>::iterator currentTexture;
+	shared_ptr<FireBall> fireball;
+	Texture fireballTexture;
+	int fireCounter;
+	bool fired;
+	Vector2f fireballVelocity;
 public:
 	FireBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b, bool e = false) :Brick(x, y, d, s),
 		bricks(b),
 		animationRefreshRate(Refresh_Frequency / 10),
-		refreshCounter(0) {
+		refreshCounter(0),
+		fireCounter(0),
+		fired(false),
+		fireballVelocity(0,0){
 		background.setFillColor(Fire_Brick_Background_Color);
 		Texture texture;
 		ostringstream ss;
@@ -32,12 +61,14 @@ public:
 		}
 		currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
+		fireball = make_shared<FireBall>(Fire_Ball_Radius);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade) {}
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
+	shared_ptr<FireBall> getFireball() { return fireball; }
 };
 
 Interaction FireBrick::interact(Ball &ball) {
@@ -65,7 +96,7 @@ Interaction FireBrick::interact(Ball &ball) {
 	return i;
 }
 
-void FireBrick::act(Ball &ball, Paddle &paddle) {
+void FireBrick::act(Player &p) {
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}
@@ -75,6 +106,26 @@ void FireBrick::act(Ball &ball, Paddle &paddle) {
 		if (currentTexture == animationTextures.end())
 			currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
+	}
+	if (fireCounter < Fire_Ball_Attack_Interval) {
+		++fireCounter;
+	}
+	else {
+		Paddle paddle = p.getPaddle();
+		fireCounter = 0;
+		fired = true;
+		fireball->setPosition(getPosition().x+getSize().x/2-fireball->getRadius(),getPosition().y+getSize().y/2-fireball->getRadius());
+		float yOffset = Play_Area_Height - (getPosition().y + getSize().y / 2);
+		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x + getSize().x / 2;
+		fireball->setVelocity(Fire_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
+		fireball->setFired(true);
+	}
+	if (fired) {
+		fireball->move();
+		if (fireball->getPosition().y > Play_Area_Height) {
+			fired = false;
+			fireball->setFired(false);
+		}
 	}
 }
 

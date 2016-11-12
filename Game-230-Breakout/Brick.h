@@ -6,7 +6,7 @@
 #include <ctime>
 #include "GameConstants.h"
 #include "Ball.h"
-#include "Paddle.h"
+#include "Player.h"
 
 using namespace sf;
 using namespace std;
@@ -49,7 +49,7 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle) {}
+	virtual void act(Player &p) {}
 	virtual void upgradeBricks(bool b) {}
 	virtual void setPosition(float x, float y);
 	virtual void setDisplay();

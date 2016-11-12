@@ -33,7 +33,7 @@ public:
 		animation.setTexture(&(*currentTexture));
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Ball &ball, Paddle &paddle);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -65,7 +65,7 @@ Interaction WaterBrick::interact(Ball &ball) {
 	return i;
 }
 
-void WaterBrick::act(Ball &ball, Paddle &paddle) {
+void WaterBrick::act(Player &player) {
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}
@@ -75,19 +75,7 @@ void WaterBrick::act(Ball &ball, Paddle &paddle) {
 		if (currentTexture == animationTextures.end())
 			currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
-	}/*
-	for (shared_ptr<Brick> b : bricks) {
-		if (b->isNormal() && getPosition().x == b->getPosition().x) {
-			if (durability > 0) {
-				b->setWaterUpgrade(true);
-				b->setAnimation(Water_Upgraded_Background_Color);
-			}
-			else {
-				b->setWaterUpgrade(false);
-				b->setAnimation(Normal_Brick_Background_Color);
-			}
-		}
-	}*/
+	}
 }
 
 void WaterBrick::upgradeBricks(bool upgrade) {
