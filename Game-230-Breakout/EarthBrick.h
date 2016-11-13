@@ -36,7 +36,7 @@ Interaction EarthBrick::interact(Ball &ball) {
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility/4;
 		if (waterUpgraded)
-			damage /= 2;
+			damage =1;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);

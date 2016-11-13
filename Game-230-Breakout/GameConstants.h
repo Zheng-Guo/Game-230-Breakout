@@ -71,4 +71,7 @@ const Color Paddle_Stunned_Color = Color::Black;
 const int Normal_Brick_Score = 10;
 const int Element_Brick_Score = 50;
 const int Null_Brick_Score = 100;
+const int Null_Cloak_Interval = 10 * Refresh_Frequency;
+const int Null_Cloak_Margin = 5;
+const int Null_Cloak_Duration = 10*Refresh_Frequency;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};

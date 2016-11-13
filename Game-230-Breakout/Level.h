@@ -112,7 +112,8 @@ void Level::resetBricks() {
 		b->setDisplay();
 	}
 	for (shared_ptr<Brick> b : bricks)
-		b->upgradeBricks(true);
+		if(!b->isNull())
+			b->upgradeBricks(true);
 }
 
 int Level::interact(Ball &ball) {

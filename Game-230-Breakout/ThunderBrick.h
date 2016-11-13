@@ -76,8 +76,8 @@ Interaction ThunderBrick::interact(Ball &ball) {
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility / 4;
-		if (waterUpgraded)
-			damage /= 2;
+		if (nullUpgraded)
+			damage = 1;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);

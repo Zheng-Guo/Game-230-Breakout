@@ -73,6 +73,7 @@ public:
 	bool getWaterUpgrade() { return waterUpgraded; }
 	void setWindUpgrade(bool b) { windUpgraded = b; }
 	bool getWindUpgrade() { return windUpgraded; }
+	void setNullUpgrade(bool b) { nullUpgraded = b; }
 	static void loadTextures();
 };
 
@@ -146,6 +147,8 @@ Interaction Brick::interact(Ball &ball) {
 			damage /= 2;
 		if (windUpgraded)
 			damage /= 2;
+		if (nullUpgraded)
+			damage = 1;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);
