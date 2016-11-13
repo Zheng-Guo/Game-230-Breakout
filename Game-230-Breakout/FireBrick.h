@@ -40,7 +40,6 @@ private:
 	shared_ptr<FireBall> fireball;
 	Texture fireballTexture;
 	int fireCounter;
-	bool fired;
 	Vector2f fireballVelocity;
 public:
 	FireBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b, bool e = false) :Brick(x, y, d, s),
@@ -48,7 +47,6 @@ public:
 		animationRefreshRate(Refresh_Frequency / 10),
 		refreshCounter(0),
 		fireCounter(0),
-		fired(false),
 		fireballVelocity(0,0){
 		background.setFillColor(Fire_Brick_Background_Color);
 		Texture texture;
@@ -64,7 +62,7 @@ public:
 		fireball = make_shared<FireBall>(Fire_Ball_Radius);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Player &p);
+	virtual int act(Player &p);
 	virtual void upgradeBricks(bool upgrade) {}
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -96,7 +94,8 @@ Interaction FireBrick::interact(Ball &ball) {
 	return i;
 }
 
-void FireBrick::act(Player &p) {
+int FireBrick::act(Player &p) {
+	int returnValule=0;
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}
@@ -113,25 +112,30 @@ void FireBrick::act(Player &p) {
 	else {
 		Paddle paddle = p.getPaddle();
 		fireCounter = 0;
-		fired = true;
 		fireball->setPosition(getPosition().x+getSize().x/2-fireball->getRadius(),getPosition().y+getSize().y/2-fireball->getRadius());
 		float yOffset = Play_Area_Height - (getPosition().y + getSize().y / 2);
 		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x + getSize().x / 2;
 		fireball->setVelocity(Fire_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
 		fireball->setFired(true);
 	}
-	if (fired) {
+	if (fireball->isFired()) {
 		fireball->move();
 		if (fireball->getPosition().y > Play_Area_Height) {
-			fired = false;
 			fireball->setFired(false);
 		}
+		else if(fireball->getGlobalBounds().intersects(p.getPaddle().getGlobalBounds())){
+			fireball->setFired(false);
+			returnValule=1;
+		}
 	}
+	return returnValule;
 }
 
 void FireBrick::setDisplay() {
 	if (!isEmpty) {
 		durability = Brick_Duribility;
 		setTexture(&textures[0]);
+		fireCounter = 0;
+		fireball->setFired(false);
 	}
 }

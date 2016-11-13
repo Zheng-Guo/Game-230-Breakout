@@ -33,6 +33,7 @@ private:
 	Clock clock;
 	Time time1, time2, time3;
 	bool gameStart,gameOver,levelEnd;
+	bool paddleStunned;
 	void resetPlayer();
 	void resetGame();
 	void nextLevel();
@@ -41,11 +42,12 @@ public:
 		statArea(Vector2f(Window_Width - Play_Area_Width, Window_Height)),
 		blackCurtain(Vector2f(Play_Area_Width, Black_Curtain_Initial_Height)),
 		redFlash(Vector2f(Play_Area_Width, Play_Area_Height)),
-		playArea(Play_Area_Width,Play_Area_Height),
-		player(Vector2f(Play_Area_X_Position+Play_Area_Width/2-Paddle_Width/2,Play_Area_Y_Position+Play_Area_Height-Paddle_Height),Play_Area_X_Position,Play_Area_X_Position+Play_Area_Width),
+		playArea(Play_Area_Width, Play_Area_Height),
+		player(Vector2f(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height), Play_Area_X_Position, Play_Area_X_Position + Play_Area_Width),
 		ball(Ball_Radius),
 		gameStart(false),
-		gameOver(false){
+		gameOver(false),
+		paddleStunned(false){
 		srand(time(NULL));
 		window.setPosition(Vector2i(400, 0));
 		statArea.setPosition(0, 0);
@@ -55,7 +57,6 @@ public:
 		blackCurtain.setPosition(Play_Area_X_Position, Play_Area_Height / 2 - Black_Curtain_Initial_Height / 2);
 		blackCurtain.setFillColor(Color::Black);
 		redFlash.setPosition(Play_Area_X_Position, Play_Area_Y_Position);
-		//redFlash.setFillColor(Color::Red);
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
 		player.setPaddleColor(Color::Blue);
 		resetPlayer();
@@ -98,6 +99,7 @@ public:
 
 void Breakout::resetPlayer() {
 	gameStart = false;
+	paddleStunned = false;
 	player.setPaddlePosition(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height);
 	ball.setPosition(Play_Area_X_Position + Play_Area_Width / 2 - Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 	ball.setXSpeed(0);
@@ -130,7 +132,7 @@ void Breakout::nextLevel() {
 
 void Breakout::startGame() {
 	int startBufferTime=0,endBufferTime,redFlashDuration=255;
-	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false;
+	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,destroyed=false;
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
 		Event event;
@@ -234,7 +236,22 @@ void Breakout::startGame() {
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
 				}
-				currentLevel->act(player);
+				i=currentLevel->act(player);
+				if (i == 1) {
+					player.lostLife();
+					moveLeft = false, moveRight = false;
+					if (player.getLives() >= 1) {
+						resetPlayer();
+						ostringstream ss;
+						ss << "Lives: " << player.getLives();
+						lives.setString(ss.str());
+						loseLife = true;
+					}
+					else {
+						message.setString("Game Over");
+						gameOver = true;
+					}
+				}
 			}
 			else {
 				++endBufferTime;

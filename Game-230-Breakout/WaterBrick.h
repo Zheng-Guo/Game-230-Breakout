@@ -33,7 +33,7 @@ public:
 		animation.setTexture(&(*currentTexture));
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual void act(Player &p);
+	virtual int act(Player &p);
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -65,7 +65,7 @@ Interaction WaterBrick::interact(Ball &ball) {
 	return i;
 }
 
-void WaterBrick::act(Player &player) {
+int WaterBrick::act(Player &player) {
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}
@@ -76,6 +76,7 @@ void WaterBrick::act(Player &player) {
 			currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
 	}
+	return 0;
 }
 
 void WaterBrick::upgradeBricks(bool upgrade) {

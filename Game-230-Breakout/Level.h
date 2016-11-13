@@ -32,10 +32,11 @@ public:
 	void loadConfig(string fileName);
 	void resetBricks();
 	int interact(Ball &ball);
-	void act(Player &p);
+	int act(Player &p);
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
 	string getLevelName() { return levelName; }
+	void ceaseFire();
 };
 
 void Level::setEdgeExposure() {
@@ -130,10 +131,21 @@ int Level::interact(Ball &ball) {
 	return score;
 }
 
-void Level::act(Player &p) {
+int Level::act(Player &p) {
+	bool killed=false, stunned=false;
 	for (shared_ptr<Brick> b : bricks) {
-		b->act(p);
+		int i=b->act(p);
+		if (i == 1)
+			killed = true;
+		if (i == 2)
+			stunned = true;
 	}
+	int returnValue = 0;
+	if (stunned)
+		returnValue = 2;
+	if (killed)
+		returnValue = 1;
+	return returnValue;
 }
 
 void Level::render(RenderWindow &window) {
@@ -150,5 +162,12 @@ void Level::render(RenderWindow &window) {
 	for (shared_ptr<FireBall> f : fireballs) {
 		if(f->isFired())
 			window.draw(*f);
+	}
+}
+
+void Level::ceaseFire() {
+	for (shared_ptr<FireBall> f : fireballs) {
+		if (f->isFired())
+			f->setFired(false);
 	}
 }

@@ -58,5 +58,5 @@ const int Water_Texture_Number = 16;
 const int Fire_Texture_Number = 21;
 const float Fire_Ball_Radius = 30;
 const int Fire_Ball_Attack_Interval = 20 * Refresh_Frequency;
-const float Fire_Ball_Y_Speed = 320 / Refresh_Frequency;
+const float Fire_Ball_Y_Speed = 400 / Refresh_Frequency;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};
