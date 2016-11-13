@@ -23,6 +23,7 @@ private:
 	RectangleShape statArea;
 	RectangleShape blackCurtain;
 	RectangleShape redFlash;
+	RectangleShape powerUpSelectionHightlight;
 	PlayArea playArea;
 	LevelManager levelManager;
 	shared_ptr<Level> currentLevel;
@@ -42,6 +43,7 @@ public:
 		statArea(Vector2f(Window_Width - Play_Area_Width, Window_Height)),
 		blackCurtain(Vector2f(Play_Area_Width, Black_Curtain_Initial_Height)),
 		redFlash(Vector2f(Play_Area_Width, Play_Area_Height)),
+		powerUpSelectionHightlight(Vector2f(Power_Up_Selection_Hightlight_Width, Power_Up_Selection_Hightlight_Height)),
 		playArea(Play_Area_Width, Play_Area_Height),
 		player(Vector2f(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height), Play_Area_X_Position, Play_Area_X_Position + Play_Area_Width),
 		ball(Ball_Radius),
@@ -92,6 +94,12 @@ public:
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
 		//currentLevel->act(player);
+		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
+		player.addPowerUp(Element::Water);
+		player.addPowerUp(Element::Thunder);
+		player.addPowerUp(Element::Wind);
+		player.addPowerUp(Element::Earth);
+		player.addPowerUp(Element::Fire);
 		resetPlayer();
 	}
 	void startGame();
@@ -115,7 +123,7 @@ void Breakout::resetGame() {
 	//currentLevel->act(player);
 	player.resetScore();
 	player.resetLives();
-	player.setPowerUpType(Element::Normal);
+	//player.setPowerUpType(Element::Normal);
 	ostringstream ss;
 	ss << "Score: " << player.getScore();
 	score.setString(ss.str());
@@ -128,7 +136,7 @@ void Breakout::nextLevel() {
 	resetPlayer();
 	currentLevel = levelManager.getNextLevel();
 	//currentLevel->act(player);
-	player.setPowerUpType(Element::Normal);
+	//player.setPowerUpType(Element::Normal);
 }
 
 void Breakout::startGame() {
@@ -324,6 +332,12 @@ void Breakout::startGame() {
 		window.draw(statArea);
 		window.draw(score);
 		window.draw(lives);
+		powerUpSelectionHightlight.setPosition(player.getSelectedPowerUp()->getPosition().x - 10, player.getSelectedPowerUp()->getPosition().y - 10);
+		window.draw(powerUpSelectionHightlight);
+		for (CircleShape c :player.getAcquiaredPowerUps()) {
+			window.draw(c);
+		}
+			
 		window.display();
 	}
 }
