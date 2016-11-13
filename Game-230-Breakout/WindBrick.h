@@ -34,6 +34,7 @@ public:
 	virtual bool isNormal() { return false; }
 	virtual void setPosition(float x, float y);
 	virtual void animate();
+	virtual bool isNull() { return false; }
 };
 
 Interaction WindBrick::interact(Ball &ball) {

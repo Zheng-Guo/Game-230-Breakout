@@ -13,6 +13,7 @@
 #include "WindBrick.h"
 #include "FireBrick.h"
 #include "ThunderBrick.h"
+#include "NullBrick.h"
 
 using namespace std;
 using namespace sf;
@@ -25,6 +26,7 @@ private:
 	vector<vector<shared_ptr<Brick>>> brickGrid;
 	vector<shared_ptr<FireBall>> fireballs;
 	vector<shared_ptr<ThunderBall>> thunderballs;
+	vector<shared_ptr<VertexArray>> colourShiftPanels;
 	string levelName;
 	int initialNumberOfBricks;
 	int numberOfBricks;
@@ -73,6 +75,7 @@ void Level::loadConfig(string fileName) {
 	int brickType;
 	shared_ptr<FireBrick> b;
 	shared_ptr<ThunderBrick> b2;
+	shared_ptr<NullBrick> b3;
 	while (ifs >> brickType) {
 		shared_ptr<Brick> brick;
 		switch (brickType) {
@@ -83,6 +86,7 @@ void Level::loadConfig(string fileName) {
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); break;
 		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; break;
+		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, Brick_Duribility, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
@@ -159,8 +163,11 @@ void Level::render(RenderWindow &window) {
 	for (shared_ptr<Brick> b : bricks) {
 		window.draw(b->getBackground());
 	}
+	for (shared_ptr<VertexArray> c : colourShiftPanels) {
+		window.draw(*c);
+	}
 	for (shared_ptr<Brick> b : bricks) {
-		if(!b->isNormal()&&!b->isBroken())
+		if(!b->isNormal()&&!b->isNull()&&!b->isBroken())
 			window.draw(b->getAnimation());
 	}
 	for (shared_ptr<Brick> b : bricks) {

@@ -160,6 +160,7 @@
     <ClInclude Include="GameConstants.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
+    <ClInclude Include="NullBrick.h" />
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="PlayArea.h" />
     <ClInclude Include="Player.h" />

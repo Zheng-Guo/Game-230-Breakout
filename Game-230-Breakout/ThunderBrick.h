@@ -67,6 +67,7 @@ public:
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 	virtual void animate();
+	virtual bool isNull() { return false; }
 	shared_ptr<ThunderBall> getThunderball() { return thunderball; }
 };
 

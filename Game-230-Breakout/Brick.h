@@ -66,6 +66,7 @@ public:
 	bool isBroken() { return durability == 0; }
 	bool isBrickEmpty() { return isEmpty; }
 	virtual bool isNormal() { return true; }
+	virtual bool isNull() { return false; }
 	void setEarthUpgrade(bool b) { earthUpgraded = b; }
 	bool getEarthUpgrade() { return earthUpgraded; }
 	void setWaterUpgrade(bool b) { waterUpgraded = b; }
