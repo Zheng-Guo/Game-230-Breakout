@@ -10,18 +10,18 @@
 using namespace sf;
 using namespace std;
 
-class FireBall :public CircleShape {
+class ThunderBall :public CircleShape {
 private:
 	Texture fireballTexture;
 	Vector2f velocity;
 	bool fired;
 public:
-	FireBall(float r) :CircleShape(r),
+	ThunderBall(float r) :CircleShape(r),
 		velocity(0, 0),
-		fired(false){
+		fired(false) {
 		ostringstream ss;
 		ss.str("");
-		ss << Texture_Folder << '/' << Texture_Brick_Subfolder << "/fireball.png";
+		ss << Texture_Folder << '/' << Texture_Brick_Subfolder << "/thunderball.png";
 		fireballTexture.loadFromFile(ss.str());
 		setTexture(&fireballTexture);
 	}
@@ -31,35 +31,35 @@ public:
 	void move() { CircleShape::move(velocity); }
 };
 
-class FireBrick :public Brick {
+class ThunderBrick :public Brick {
 private:
 	vector<shared_ptr<Brick>> &bricks;
 	const int animationRefreshRate;
 	int refreshCounter;
 	vector<Texture>::iterator currentTexture;
-	shared_ptr<FireBall> fireball;
+	shared_ptr<ThunderBall> thunderball;
 	Texture fireballTexture;
 	int fireCounter;
 	int attackInterval;
 public:
-	FireBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b, bool e = false) :Brick(x, y, d, s),
+	ThunderBrick(float x, float y, int d, int s, vector<shared_ptr<Brick>> &b, bool e = false) :Brick(x, y, d, s),
 		bricks(b),
 		animationRefreshRate(Refresh_Frequency / 10),
 		refreshCounter(0),
-		fireCounter(0){
-		background.setFillColor(Fire_Brick_Background_Color);
+		fireCounter(0) {
+		background.setFillColor(Thunder_Brick_Background_Color);
 		Texture texture;
 		ostringstream ss;
-		for (int i = 1; i <= Fire_Texture_Number; i++) {
+		for (int i = 1; i <= Thunder_Texture_Number; i++) {
 			ss.str("");
-			ss << Texture_Folder << '/' << Texture_Brick_Subfolder << "/fire" << i << ".png";
+			ss << Texture_Folder << '/' << Texture_Brick_Subfolder << "/thunder" << i << ".png";
 			texture.loadFromFile(ss.str());
 			animationTextures.push_back(texture);
 		}
 		currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
-		fireball = make_shared<FireBall>(Fire_Ball_Radius);
-		attackInterval = Fire_Ball_Attack_Interval + rand()%(Fire_Ball_Attack_Margin*Refresh_Frequency);
+		thunderball = make_shared<ThunderBall>(Thunder_Ball_Radius);
+		attackInterval = Thunder_Ball_Attack_Interval + rand() % (Thunder_Ball_Attack_Margin*Refresh_Frequency);
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual int act(Player &p);
@@ -67,10 +67,10 @@ public:
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 	virtual void animate();
-	shared_ptr<FireBall> getFireball() { return fireball; }
+	shared_ptr<ThunderBall> getThunderball() { return thunderball; }
 };
 
-Interaction FireBrick::interact(Ball &ball) {
+Interaction ThunderBrick::interact(Ball &ball) {
 	Interaction i = bounce(ball);
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
@@ -95,44 +95,44 @@ Interaction FireBrick::interact(Ball &ball) {
 	return i;
 }
 
-int FireBrick::act(Player &p) {
-	int returnValule=0;
+int ThunderBrick::act(Player &p) {
+	int returnValule = 0;
 	if (fireCounter < attackInterval) {
 		++fireCounter;
 	}
 	else {
-		attackInterval = Fire_Ball_Attack_Interval + rand() % (Fire_Ball_Attack_Margin*Refresh_Frequency);
+		attackInterval = Thunder_Ball_Attack_Interval + rand() % (Thunder_Ball_Attack_Margin*Refresh_Frequency);
 		Paddle paddle = p.getPaddle();
 		fireCounter = 0;
-		fireball->setPosition(getPosition().x+getSize().x/2-fireball->getRadius(),getPosition().y+getSize().y/2-fireball->getRadius());
+		thunderball->setPosition(getPosition().x + getSize().x / 2 - thunderball->getRadius(), getPosition().y + getSize().y / 2 - thunderball->getRadius());
 		float yOffset = Play_Area_Height - (getPosition().y + getSize().y / 2);
 		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x + getSize().x / 2;
-		fireball->setVelocity(Fire_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
-		fireball->setFired(true);
+		thunderball->setVelocity(Thunder_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
+		thunderball->setFired(true);
 	}
-	if (fireball->isFired()) {
-		fireball->move();
-		if (fireball->getPosition().y > Play_Area_Height) {
-			fireball->setFired(false);
+	if (thunderball->isFired()) {
+		thunderball->move();
+		if (thunderball->getPosition().y > Play_Area_Height) {
+			thunderball->setFired(false);
 		}
-		else if(fireball->getGlobalBounds().intersects(p.getPaddle().getGlobalBounds())){
-			fireball->setFired(false);
-			returnValule=1;
+		else if (thunderball->getGlobalBounds().intersects(p.getPaddle().getGlobalBounds())) {
+			thunderball->setFired(false);
+			returnValule = 2;
 		}
 	}
 	return returnValule;
 }
 
-void FireBrick::setDisplay() {
+void ThunderBrick::setDisplay() {
 	if (!isEmpty) {
 		durability = Brick_Duribility;
 		setTexture(&textures[0]);
 		fireCounter = 0;
-		fireball->setFired(false);
+		thunderball->setFired(false);
 	}
 }
 
-void FireBrick::animate() {
+void ThunderBrick::animate() {
 	if (refreshCounter < animationRefreshRate) {
 		++refreshCounter;
 	}

@@ -164,6 +164,7 @@
     <ClInclude Include="PlayArea.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="ThunderBrick.h" />
     <ClInclude Include="WaterBrick.h" />
     <ClInclude Include="WindBrick.h" />
   </ItemGroup>

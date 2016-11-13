@@ -37,6 +37,7 @@ public:
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
+	virtual void animate();
 };
 
 Interaction WaterBrick::interact(Ball &ball) {
@@ -66,16 +67,6 @@ Interaction WaterBrick::interact(Ball &ball) {
 }
 
 int WaterBrick::act(Player &player) {
-	if (refreshCounter < animationRefreshRate) {
-		++refreshCounter;
-	}
-	else {
-		refreshCounter = 0;
-		currentTexture++;
-		if (currentTexture == animationTextures.end())
-			currentTexture = animationTextures.begin();
-		animation.setTexture(&(*currentTexture));
-	}
 	return 0;
 }
 
@@ -105,4 +96,18 @@ void WaterBrick::setDisplay() {
 		durability = Brick_Duribility;
 		setTexture(&textures[0]);
 	}
+}
+
+void WaterBrick::animate() {
+	if (refreshCounter < animationRefreshRate) {
+		++refreshCounter;
+	}
+	else {
+		refreshCounter = 0;
+		currentTexture++;
+		if (currentTexture == animationTextures.end())
+			currentTexture = animationTextures.begin();
+		animation.setTexture(&(*currentTexture));
+	}
+	
 }

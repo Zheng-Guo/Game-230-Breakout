@@ -12,6 +12,7 @@
 #include "WaterBrick.h"
 #include "WindBrick.h"
 #include "FireBrick.h"
+#include "ThunderBrick.h"
 
 using namespace std;
 using namespace sf;
@@ -23,6 +24,7 @@ private:
 	vector<shared_ptr<Brick>> bricks;
 	vector<vector<shared_ptr<Brick>>> brickGrid;
 	vector<shared_ptr<FireBall>> fireballs;
+	vector<shared_ptr<ThunderBall>> thunderballs;
 	string levelName;
 	int initialNumberOfBricks;
 	int numberOfBricks;
@@ -36,6 +38,7 @@ public:
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
 	string getLevelName() { return levelName; }
+	void animate();
 	void ceaseFire();
 };
 
@@ -69,15 +72,17 @@ void Level::loadConfig(string fileName) {
 	getline(ifs,levelName);
 	int brickType;
 	shared_ptr<FireBrick> b;
+	shared_ptr<ThunderBrick> b2;
 	while (ifs >> brickType) {
 		shared_ptr<Brick> brick;
 		switch (brickType) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
-		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, 10); break;
-		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
-		case Element::Fire:b = make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); fireballs.push_back(b->getFireball()); brick = b; break;
-		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20,bricks); break;
-		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, 20, bricks); break;
+		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, Normal_Brick_Score); break;
+		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
+		case Element::Fire:b = make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); fireballs.push_back(b->getFireball()); brick = b; break;
+		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
+		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); break;
+		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
@@ -134,11 +139,13 @@ int Level::interact(Ball &ball) {
 int Level::act(Player &p) {
 	bool killed=false, stunned=false;
 	for (shared_ptr<Brick> b : bricks) {
-		int i=b->act(p);
-		if (i == 1)
-			killed = true;
-		if (i == 2)
-			stunned = true;
+		if (!b->isBroken()) {
+			int i = b->act(p);
+			if (i == 1)
+				killed = true;
+			if (i == 2)
+				stunned = true;
+		}	
 	}
 	int returnValue = 0;
 	if (stunned)
@@ -163,11 +170,25 @@ void Level::render(RenderWindow &window) {
 		if(f->isFired())
 			window.draw(*f);
 	}
+	for (shared_ptr<ThunderBall> t : thunderballs) {
+		if(t->isFired())
+			window.draw(*t);
+	}
+}
+
+void Level::animate() {
+	for (shared_ptr<Brick> b : bricks) {
+		b->animate();
+	}
 }
 
 void Level::ceaseFire() {
 	for (shared_ptr<FireBall> f : fireballs) {
 		if (f->isFired())
 			f->setFired(false);
+	}
+	for (shared_ptr<ThunderBall> t : thunderballs) {
+		if (t->isFired())
+			t->setFired(false);
 	}
 }

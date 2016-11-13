@@ -53,6 +53,7 @@ public:
 	virtual void upgradeBricks(bool b) {}
 	virtual void setPosition(float x, float y);
 	virtual void setDisplay();
+	virtual void animate(){}
 	void setBackground(Color c) { background.setFillColor(c); }
 	void setAnimation(Color c) { animation.setFillColor(c); }
 	RectangleShape getBackground() { return background; }

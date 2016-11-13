@@ -62,5 +62,8 @@
     <ClInclude Include="FireBrick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ThunderBrick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

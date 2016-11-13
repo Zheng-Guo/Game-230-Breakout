@@ -33,6 +33,7 @@ public:
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 	virtual void setPosition(float x, float y);
+	virtual void animate();
 };
 
 Interaction WindBrick::interact(Ball &ball) {
@@ -70,13 +71,7 @@ Interaction WindBrick::interact(Ball &ball) {
 }
 
 int WindBrick::act(Player &p) {
-	if (refreshCounter < animationRefreshRate) {
-		++refreshCounter;
-	}
-	else {
-		refreshCounter = 0;
-		animation.rotate(30);
-	}
+	
 	return 0;
 }
 
@@ -106,4 +101,14 @@ void WindBrick::setPosition(float x, float y) {
 	RectangleShape::setPosition(x, y);
 	animation.setPosition(getSize().x/2+x, getSize().y/2+y);
 	background.setPosition(x, y);
+}
+
+void WindBrick::animate() {
+	if (refreshCounter < animationRefreshRate) {
+		++refreshCounter;
+	}
+	else {
+		refreshCounter = 0;
+		animation.rotate(30);
+	}
 }

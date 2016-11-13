@@ -58,8 +58,7 @@ public:
 		blackCurtain.setFillColor(Color::Black);
 		redFlash.setPosition(Play_Area_X_Position, Play_Area_Y_Position);
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
-		player.setPaddleColor(Color::Blue);
-		resetPlayer();
+		player.setPaddleColor(Paddle_Normal_Color);
 		font.loadFromFile("Tinos-Regular.ttf");
 		ostringstream ss;
 		ss << "Score: " << player.getScore();
@@ -92,7 +91,8 @@ public:
 		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
-		currentLevel->act(player);
+		//currentLevel->act(player);
+		resetPlayer();
 	}
 	void startGame();
 };
@@ -100,6 +100,7 @@ public:
 void Breakout::resetPlayer() {
 	gameStart = false;
 	paddleStunned = false;
+	currentLevel->ceaseFire();
 	player.setPaddlePosition(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height);
 	ball.setPosition(Play_Area_X_Position + Play_Area_Width / 2 - Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 	ball.setXSpeed(0);
@@ -111,7 +112,7 @@ void Breakout::resetGame() {
 	resetPlayer();
 	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
-	currentLevel->act(player);
+	//currentLevel->act(player);
 	player.resetScore();
 	player.resetLives();
 	player.setPowerUpType(Element::Normal);
@@ -126,13 +127,13 @@ void Breakout::resetGame() {
 void Breakout::nextLevel() {
 	resetPlayer();
 	currentLevel = levelManager.getNextLevel();
-	currentLevel->act(player);
+	//currentLevel->act(player);
 	player.setPowerUpType(Element::Normal);
 }
 
 void Breakout::startGame() {
-	int startBufferTime=0,endBufferTime,redFlashDuration=255;
-	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,destroyed=false;
+	int startBufferTime=0,endBufferTime,redFlashDuration=255,stunnedCounter;
+	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,stued=false;
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
 		Event event;
@@ -160,6 +161,7 @@ void Breakout::startGame() {
 		time3 = time2 - time1;
 		if (time3.asSeconds() >= Refresh_Interval&&!gameOver) {
 			time1 = time2;
+			currentLevel->animate();
 			if (levelStart) {
 				++startBufferTime;
 				if (startBufferTime <= Refresh_Frequency / 2) {
@@ -219,10 +221,20 @@ void Breakout::startGame() {
 						gameOver = true;
 					}
 				}
-				if (moveLeft)
-					player.moveLeft();
-				if (moveRight)
-					player.moveRight();
+				if (paddleStunned) {
+					if (stunnedCounter > 0)
+						--stunnedCounter;
+					else {
+						paddleStunned = false;
+						player.setPaddleColor(Paddle_Normal_Color);
+					}
+				}
+				else {
+					if (moveLeft)
+						player.moveLeft();
+					if (moveRight)
+						player.moveRight();
+				}
 				player.interact(ball);
 				int s = currentLevel->interact(ball);
 				if (s > 0) {
@@ -236,20 +248,27 @@ void Breakout::startGame() {
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
 				}
-				i=currentLevel->act(player);
-				if (i == 1) {
-					player.lostLife();
-					moveLeft = false, moveRight = false;
-					if (player.getLives() >= 1) {
-						resetPlayer();
-						ostringstream ss;
-						ss << "Lives: " << player.getLives();
-						lives.setString(ss.str());
-						loseLife = true;
+				if (gameStart) {
+					i = currentLevel->act(player);
+					if (i == 1) {
+						player.lostLife();
+						moveLeft = false, moveRight = false;
+						if (player.getLives() >= 1) {
+							resetPlayer();
+							ostringstream ss;
+							ss << "Lives: " << player.getLives();
+							lives.setString(ss.str());
+							loseLife = true;
+						}
+						else {
+							message.setString("Game Over");
+							gameOver = true;
+						}
 					}
-					else {
-						message.setString("Game Over");
-						gameOver = true;
+					if (i == 2) {
+						paddleStunned = true;
+						stunnedCounter = Player_Stunned_Duration;
+						player.setPaddleColor(Paddle_Stunned_Color);
 					}
 				}
 			}

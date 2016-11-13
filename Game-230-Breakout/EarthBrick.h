@@ -26,6 +26,7 @@ public:
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
+	virtual void animate() {}
 };
 
 Interaction EarthBrick::interact(Ball &ball) {
