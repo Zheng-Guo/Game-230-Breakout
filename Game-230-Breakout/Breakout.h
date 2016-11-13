@@ -93,7 +93,6 @@ public:
 		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
-		//currentLevel->act(player);
 		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
 		player.addPowerUp(Element::Water);
 		player.addPowerUp(Element::Thunder);
@@ -110,6 +109,8 @@ void Breakout::resetPlayer() {
 	paddleStunned = false;
 	currentLevel->ceaseFire();
 	player.setPaddlePosition(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height);
+	player.resetPowerUp();
+	player.setPaddleColor(Paddle_Normal_Color);
 	ball.setPosition(Play_Area_X_Position + Play_Area_Width / 2 - Ball_Radius, Play_Area_Height - Paddle_Height - Ball_Radius * 2);
 	ball.setXSpeed(0);
 	ball.setYSpeed(0);
@@ -120,10 +121,8 @@ void Breakout::resetGame() {
 	resetPlayer();
 	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
-	//currentLevel->act(player);
 	player.resetScore();
 	player.resetLives();
-	//player.setPowerUpType(Element::Normal);
 	ostringstream ss;
 	ss << "Score: " << player.getScore();
 	score.setString(ss.str());
@@ -135,13 +134,12 @@ void Breakout::resetGame() {
 void Breakout::nextLevel() {
 	resetPlayer();
 	currentLevel = levelManager.getNextLevel();
-	//currentLevel->act(player);
-	//player.setPowerUpType(Element::Normal);
 }
 
 void Breakout::startGame() {
 	int startBufferTime=0,endBufferTime,redFlashDuration=255,stunnedCounter;
 	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,stued=false;
+	float ballradius = ball.getRadius();
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
 		Event event;
@@ -153,6 +151,10 @@ void Breakout::startGame() {
 				moveLeft = true;
 			if (Keyboard::isKeyPressed(Keyboard::Right)&& gameStart)
 				moveRight = true;
+			if (Keyboard::isKeyPressed(Keyboard::Up) && gameStart)
+				player.nextPowerUp();
+			if (Keyboard::isKeyPressed(Keyboard::Down) && gameStart)
+				player.previousPowerUp();
 			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart&&!loseLife) {
 				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
 				ball.setXSpeed(initialBallXSpeed);
@@ -212,6 +214,8 @@ void Breakout::startGame() {
 				}
 			}
 			else if (!levelEnd) {
+				if (ball.getRadius() != ballradius)
+					cout << "Ball size changed: " << ball.getRadius() << endl;
 				ball.move();
 				int i = playArea.interact(ball);
 				if (i == 1) {
@@ -332,12 +336,12 @@ void Breakout::startGame() {
 		window.draw(statArea);
 		window.draw(score);
 		window.draw(lives);
-		powerUpSelectionHightlight.setPosition(player.getSelectedPowerUp()->getPosition().x - 10, player.getSelectedPowerUp()->getPosition().y - 10);
+		powerUpSelectionHightlight.setPosition(player.getAcquiaredPowerUps()[player.getSelectedPowerUp()].getPosition().x - 10, player.getAcquiaredPowerUps()[player.getSelectedPowerUp()].getPosition().y - 10);
 		window.draw(powerUpSelectionHightlight);
 		for (CircleShape c :player.getAcquiaredPowerUps()) {
 			window.draw(c);
 		}
-			
+		window.draw(player.getSelectedPowerUpDescription());
 		window.display();
 	}
 }

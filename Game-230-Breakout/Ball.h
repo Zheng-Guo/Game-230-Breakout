@@ -28,11 +28,11 @@ public:
 	Vector2f getVelocity() const { return velocity; }
 	void move() { CircleShape::move(velocity); }
 	int getPowerUpType() { return powerUpType; }
-	void setPowerUpType(Element p) { powerUpType = p; }
-	void setElementTexture(Element p);
+	void setPowerUpType(Element p);
 };
 
-void Ball::setElementTexture(Element p) {
+void Ball::setPowerUpType(Element p) {
+	powerUpType = p;
 	switch (p) {
 	case Element::Normal:setTexture(nullptr); break;
 	case Element::Water:setTexture(&textures[0]); break;

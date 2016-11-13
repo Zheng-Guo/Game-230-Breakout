@@ -16,19 +16,20 @@ private:
 	vector<Texture> powerUpTextures;
 	vector<CircleShape> acquiredPowerUps;
 	vector<Element> powerUps;
-	vector<CircleShape>::iterator powerUpSelected;
-	Element currentPowerUp;
+	vector<Text> powerUpDescriptions;
+	Font font;
+	int powerUpSelected;
 	int score;
 	int life;
 	float leftBound, rightBound;
 	bool poweredUp, powerUpUsed;
 public:
 	Player(Vector2f position,float l,float r) :paddle(Paddle_Width, Paddle_Height, Deflection_Coefficient),
-		currentPowerUp(Element::Normal),
 		score(0),
 		life(Player_Initial_Lives),
 		leftBound(l),
 		rightBound(r),
+		powerUpSelected(0),
 		poweredUp(false),
 		powerUpUsed(false){
 		paddle.setOutlineColor(Color::Black);
@@ -56,11 +57,18 @@ public:
 		ss << Texture_Folder << '/' << Texture_PowerUp_Subfolder << "/Thunder powerup.png";
 		texture.loadFromFile(ss.str());
 		powerUpTextures.push_back(texture);
+		font.loadFromFile("Tinos-Regular.ttf");
 		CircleShape noPowerUp(Power_Up_Display_Radius);
 		noPowerUp.setPosition(Power_Up_Display_X, Power_Up_Display_Y);
 		acquiredPowerUps.push_back(noPowerUp);
 		powerUps.push_back(Element::Normal);
-		powerUpSelected = acquiredPowerUps.begin();
+		Text t;
+		t.setString("Normal"); 
+		t.setFont(font); 
+		t.setCharacterSize(Stat_Character_Size); 
+		t.setFillColor(Color::Blue); 
+		t.setPosition(Power_Up_Display_X + 70, noPowerUp.getPosition().y + 20);
+		powerUpDescriptions.push_back(t);
 		srand(time(NULL));
 	}
 	Paddle getPaddle() { return paddle; }
@@ -75,10 +83,11 @@ public:
 	void moveLeft();
 	void moveRight();
 	void interact(Ball &ball);
-	vector<CircleShape>::iterator getSelectedPowerUp() { return powerUpSelected;}
-	void previousPowerUp() { if(powerUpSelected!=acquiredPowerUps.begin()) --powerUpSelected; }
-	void nextPowerUp() { if(powerUpSelected+1!=acquiredPowerUps.end()) ++powerUpSelected; }
-	void resetPowerUp() { powerUpSelected = acquiredPowerUps.begin(); currentPowerUp = powerUps[0]; }
+	int getSelectedPowerUp() { return powerUpSelected;}
+	Text getSelectedPowerUpDescription() { return powerUpDescriptions[powerUpSelected]; }
+	void previousPowerUp() { if(powerUpSelected>0) --powerUpSelected; }
+	void nextPowerUp() { if(powerUpSelected<acquiredPowerUps.size()-1) ++powerUpSelected; }
+	void resetPowerUp() { powerUpSelected = 0; }
 	void addPowerUp(Element p);
 	void setPowerUp(bool p) { poweredUp = p; }
 	void setPowerUpUsed(bool p) { powerUpUsed = p; }
@@ -105,7 +114,8 @@ void Player::moveRight() {
 
 
 void Player::interact(Ball &ball) {
-	paddle.interact(ball);
+	if(paddle.interact(ball))
+		ball.setPowerUpType(powerUps[powerUpSelected]);
 	if (powerUpUsed) {//Throw only one paddle at a time.
 
 	}
@@ -121,12 +131,12 @@ void Player::usePowerUp() {
 
 void Player::addPowerUp(Element p) {
 	CircleShape c;
+	Text t;
 	switch (p) {
-	case Element::Water:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[0]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Water); break;
-	case Element::Fire:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[1]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Fire); break;
-	case Element::Earth:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[2]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Earth); break;
-	case Element::Wind:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[3]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Wind); break;
-	case Element::Thunder:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[4]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Thunder); break;
+	case Element::Water:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[0]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Water); t.setString("Water"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
+	case Element::Fire:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[1]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Fire); t.setString("Fire"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
+	case Element::Earth:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[2]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Earth); t.setString("Earth"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
+	case Element::Wind:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[3]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Wind); t.setString("Wind"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
+	case Element::Thunder:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[4]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Thunder); t.setString("Thunder"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
 	}
-	powerUpSelected = acquiredPowerUps.begin();
 }

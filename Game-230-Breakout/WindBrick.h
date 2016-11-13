@@ -20,8 +20,8 @@ public:
 		bricks(b),
 		animationRefreshRate(Refresh_Frequency / 10),
 		refreshCounter(0) {
-		animation.setOrigin(x / 2*3, y / 2*3);
-		animation.setSize(Vector2f(Brick_Width * 3, Brick_Height * 3));
+		animation.setSize(Vector2f(Brick_Width * 2.8, Brick_Height * 2.8));
+		animation.setOrigin(animation.getSize().x / 2, animation.getSize().y / 2);
 		Texture texture;
 		texture.loadFromFile(string(Texture_Folder) + '/' + Texture_Brick_Subfolder + '/' + "wind.png");
 		animationTextures.push_back(texture);
@@ -95,6 +95,7 @@ void WindBrick::setDisplay() {
 	if (!isEmpty) {
 		durability = Brick_Duribility;
 		setTexture(&textures[0]);
+		animation.setTexture(&animationTextures[0]);
 	}
 }
 
