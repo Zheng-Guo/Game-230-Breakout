@@ -90,4 +90,5 @@ const float Power_Up_Label_X = 10;
 const int Player_Intact = 0;
 const int Player_Killed = 1;
 const int Player_Stunned = 2;
+const int Black_Curtain_Help_Height = 700;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};

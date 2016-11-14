@@ -31,7 +31,7 @@ private:
 	shared_ptr<Level> currentLevel;
 	Player player;
 	Ball ball;
-	Text score, lives,message,levelName,restartInstruction,powerUpLabel;
+	Text score, lives,message,levelName,restartInstruction,powerUpLabel,startInstruction,helpInstruction;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
@@ -42,7 +42,7 @@ private:
 	void resetGame();
 	void nextLevel();
 public:
-	Breakout() :window(VideoMode(Window_Width, Window_Height), "Breakout", Style::Close | Style::Titlebar),
+	Breakout() :window(VideoMode(Window_Width, Window_Height), "Attack on Bricks", Style::Close | Style::Titlebar),
 		statArea(Vector2f(Window_Width - Play_Area_Width, Window_Height)),
 		blackCurtain(Vector2f(Play_Area_Width, Black_Curtain_Initial_Height)),
 		redFlash(Vector2f(Play_Area_Width, Play_Area_Height)),
@@ -101,6 +101,16 @@ public:
 		powerUpLabel.setFont(font);
 		powerUpLabel.setCharacterSize(Stat_Character_Size);
 		powerUpLabel.setFillColor(Color::Blue);
+		startInstruction.setString("Press Space to start/resume the game.");
+		startInstruction.setFont(font);
+		startInstruction.setCharacterSize(Stat_Character_Size);
+		startInstruction.setFillColor(Color::Red);
+		startInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
+		helpInstruction.setString("Press H to display help.");
+		helpInstruction.setFont(font);
+		helpInstruction.setCharacterSize(Stat_Character_Size);
+		helpInstruction.setFillColor(Color::Red);
+		helpInstruction.setPosition(Message_X_Position, Message_Y_Position + 130);
 		Brick::loadTextures();
 		Brick::loadSound();
 		currentLevel = levelManager.getFirstLevel();
@@ -148,8 +158,8 @@ void Breakout::nextLevel() {
 }
 
 void Breakout::startGame() {
-	int startBufferTime=0,endBufferTime,redFlashDuration=255,stunnedCounter,explosionCounter=0;
-	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,stued=false,bossDefeated=false;
+	int startBufferTime = 0, endBufferTime, redFlashDuration = 255, stunnedCounter, explosionCounter = 0, initializeHelpTime = 0,exitHelpTime=0;
+	bool moveLeft = false, moveRight = false, levelStart = true, loseLife = false, stued = false, bossDefeated = false, displayInstruction = false, displayHelp = false, displayHelpText = false, initializeHelp = false, exitHelp = false;
 	float ballradius = ball.getRadius();
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
@@ -166,16 +176,25 @@ void Breakout::startGame() {
 				player.nextPowerUp();
 			if (Keyboard::isKeyPressed(Keyboard::Down) && gameStart)
 				player.previousPowerUp();
-			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart&&!loseLife) {
+			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart&&!loseLife&&!displayHelp) {
 				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
 				ball.setXSpeed(initialBallXSpeed);
 				ball.setYSpeed(Ball_Initial_Speed+ballAcceleration);
 				gameStart = true;
+				displayInstruction = false;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Space) && gameOver) {
 				message.setString("");
 				resetGame();
 				levelStart = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::H) && displayInstruction&&!displayHelpText&&!exitHelp) {
+				initializeHelp = true;
+				displayHelp = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::H) && displayHelpText) {
+				displayHelpText = false;
+				exitHelp=true;
 			}
 		}
 		time2 = clock.getElapsedTime();
@@ -225,6 +244,45 @@ void Breakout::startGame() {
 				else {
 					startBufferTime = 0;
 					levelStart = false;
+					displayInstruction = true;
+				}
+			}
+			else if (initializeHelp) {
+				++initializeHelpTime;
+				if (initializeHelpTime <= Refresh_Frequency / 2) {
+					float y = blackCurtain.getSize().y;
+					float x = Play_Area_Width / (Refresh_Frequency / 2)*initializeHelpTime;
+					blackCurtain.setSize(Vector2f(x, y));
+				}
+				else if (initializeHelpTime <= Refresh_Frequency) {
+					float x = blackCurtain.getSize().x;
+					float y = (Black_Curtain_Help_Height - Black_Curtain_Initial_Height) / Refresh_Frequency*(initializeHelpTime - Refresh_Frequency / 2) * 2 + Black_Curtain_Initial_Height;
+					blackCurtain.setSize(Vector2f(x, y));
+					blackCurtain.setPosition(blackCurtain.getPosition().x, Play_Area_Height / 2 - blackCurtain.getSize().y / 2);
+				}
+				else {
+					initializeHelpTime = 0;
+					initializeHelp = false;
+					displayHelpText = true;
+				}
+			}
+			else if (exitHelp) {
+				++exitHelpTime;
+				if (exitHelpTime <= Refresh_Frequency / 2 ) {
+					float x = blackCurtain.getSize().x;
+					float y = (Black_Curtain_Help_Height - Black_Curtain_Initial_Height) / Refresh_Frequency*(Refresh_Frequency / 2 - exitHelpTime) * 2 + Black_Curtain_Initial_Height;
+					blackCurtain.setSize(Vector2f(x, y));
+					blackCurtain.setPosition(blackCurtain.getPosition().x, Play_Area_Height / 2 - blackCurtain.getSize().y / 2);
+				}
+				else if (exitHelpTime <= Refresh_Frequency) {
+					float y = blackCurtain.getSize().y;
+					float x = Play_Area_Width / (Refresh_Frequency / 2)*(Refresh_Frequency - exitHelpTime);
+					blackCurtain.setSize(Vector2f(x, y));
+				}
+				else {
+					exitHelpTime = 0;
+					exitHelp = false;
+					displayHelp = false;
 				}
 			}
 			else if (loseLife) {
@@ -233,6 +291,7 @@ void Breakout::startGame() {
 				if (redFlashDuration == 0) {
 					loseLife = false;
 					redFlashDuration = 255;
+					displayInstruction = true;
 				}
 			}
 			else if (!levelEnd) {
@@ -347,11 +406,15 @@ void Breakout::startGame() {
 		window.draw(player.getPaddle());
 		window.draw(ball);
 		window.draw(message);
+		if (displayInstruction) {
+			window.draw(startInstruction);
+			window.draw(helpInstruction);
+		}
 		if (levelStart) {
 			window.draw(blackCurtain);
 			window.draw(levelName);
 		}
-		if (levelEnd)
+		if (levelEnd||displayHelp)
 			window.draw(blackCurtain);
 		if (gameOver) 
 			window.draw(restartInstruction);

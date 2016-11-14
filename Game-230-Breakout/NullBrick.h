@@ -92,7 +92,7 @@ Interaction NullBrick::interact(Ball &ball) {
 			damage = 1;
 		else
 			damage = 0;
-		durability -= 16;
+		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);
 		else if (durability > Brick_Duribility / 2)
