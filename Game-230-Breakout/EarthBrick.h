@@ -22,7 +22,7 @@ public:
 		animation.setTexture(&animationTextures[0]);		
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p) { return 0; }
+	virtual void act(Player &p) { }
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }

@@ -29,7 +29,22 @@ public:
 	bool isFired() { return fired; }
 	void setVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
 	void move() { CircleShape::move(velocity); }
+	int act(Player &player);
 };
+
+int ThunderBall::act(Player &player) {
+	if (fired) {
+		move();
+		if (getPosition().y > Play_Area_Height) {
+			fired = false;
+		}
+		else if (getGlobalBounds().intersects(player.getPaddle().getGlobalBounds())) {
+			fired = false;
+			return Player_Stunned;
+		}
+	}
+	return Player_Intact;
+}
 
 class ThunderBrick :public Brick {
 private:
@@ -62,7 +77,7 @@ public:
 		attackInterval = Thunder_Ball_Attack_Interval + rand() % (Thunder_Ball_Attack_Margin*Refresh_Frequency);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade) {}
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -104,8 +119,7 @@ Interaction ThunderBrick::interact(Ball &ball) {
 	return i;
 }
 
-int ThunderBrick::act(Player &p) {
-	int returnValule = 0;
+void ThunderBrick::act(Player &p) {
 	if (fireCounter < attackInterval) {
 		++fireCounter;
 	}
@@ -115,21 +129,10 @@ int ThunderBrick::act(Player &p) {
 		fireCounter = 0;
 		thunderball->setPosition(getPosition().x + getSize().x / 2 - thunderball->getRadius(), getPosition().y + getSize().y / 2 - thunderball->getRadius());
 		float yOffset = Play_Area_Height - (getPosition().y + getSize().y / 2);
-		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x + getSize().x / 2;
+		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x - getSize().x / 2;
 		thunderball->setVelocity(Thunder_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
 		thunderball->setFired(true);
 	}
-	if (thunderball->isFired()) {
-		thunderball->move();
-		if (thunderball->getPosition().y > Play_Area_Height) {
-			thunderball->setFired(false);
-		}
-		else if (thunderball->getGlobalBounds().intersects(p.getPaddle().getGlobalBounds())) {
-			thunderball->setFired(false);
-			returnValule = 2;
-		}
-	}
-	return returnValule;
 }
 
 void ThunderBrick::setDisplay() {

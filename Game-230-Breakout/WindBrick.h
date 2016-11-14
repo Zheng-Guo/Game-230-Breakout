@@ -28,7 +28,7 @@ public:
 		animation.setTexture(&animationTextures[0]);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p);
+	virtual void act(Player &p){}
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -75,11 +75,6 @@ Interaction WindBrick::interact(Ball &ball) {
 		}
 	}
 	return i;
-}
-
-int WindBrick::act(Player &p) {
-	
-	return 0;
 }
 
 void WindBrick::upgradeBricks(bool upgrade) {

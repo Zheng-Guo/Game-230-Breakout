@@ -29,7 +29,22 @@ public:
 	bool isFired() { return fired; }
 	void setVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
 	void move() { CircleShape::move(velocity); }
+	int act(Player &player);
 };
+
+int FireBall::act(Player &player) {
+	if (fired) {
+		move();
+		if (getPosition().y > Play_Area_Height) {
+			fired = false;
+		}
+		else if (getGlobalBounds().intersects(player.getPaddle().getGlobalBounds())) {
+			fired = false;
+			return Player_Killed;
+		}
+	}
+	return Player_Intact;
+}
 
 class FireBrick :public Brick {
 private:
@@ -62,7 +77,7 @@ public:
 		attackInterval = Fire_Ball_Attack_Interval + rand()%(Fire_Ball_Attack_Margin*Refresh_Frequency);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade) {}
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -104,8 +119,7 @@ Interaction FireBrick::interact(Ball &ball) {
 	return i;
 }
 
-int FireBrick::act(Player &p) {
-	int returnValule=0;
+void FireBrick::act(Player &p) {
 	if (fireCounter < attackInterval) {
 		++fireCounter;
 	}
@@ -115,21 +129,10 @@ int FireBrick::act(Player &p) {
 		fireCounter = 0;
 		fireball->setPosition(getPosition().x+getSize().x/2-fireball->getRadius(),getPosition().y+getSize().y/2-fireball->getRadius());
 		float yOffset = Play_Area_Height - (getPosition().y + getSize().y / 2);
-		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x + getSize().x / 2;
+		float xOffset = paddle.getPosition().x + paddle.getSize().x / 2 - getPosition().x - getSize().x / 2;
 		fireball->setVelocity(Fire_Ball_Y_Speed / yOffset*xOffset, Fire_Ball_Y_Speed);
 		fireball->setFired(true);
 	}
-	if (fireball->isFired()) {
-		fireball->move();
-		if (fireball->getPosition().y > Play_Area_Height) {
-			fireball->setFired(false);
-		}
-		else if(fireball->getGlobalBounds().intersects(p.getPaddle().getGlobalBounds())){
-			fireball->setFired(false);
-			returnValule=1;
-		}
-	}
-	return returnValule;
 }
 
 void FireBrick::setDisplay() {

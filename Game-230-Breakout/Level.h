@@ -235,18 +235,22 @@ int Level::act(Player &p) {
 	bool killed=false, stunned=false;
 	for (shared_ptr<Brick> b : bricks) {
 		if (!b->isBroken()) {
-			int i = b->act(p);
-			if (i == 1)
-				killed = true;
-			if (i == 2)
-				stunned = true;
+			b->act(p);
 		}	
 	}
-	int returnValue = 0;
+	for (shared_ptr<FireBall> f : fireballs) {
+		if (f->isFired() && f->act(p) == Player_Killed)
+			killed = true;
+	}
+	for (shared_ptr<ThunderBall> t : thunderballs) {
+		if (t->isFired() && t->act(p) == Player_Stunned)
+			stunned = true;
+	}
+	int returnValue = Player_Intact;
 	if (stunned)
-		returnValue = 2;
+		returnValue = Player_Stunned;
 	if (killed)
-		returnValue = 1;
+		returnValue = Player_Killed;
 	return returnValue;
 }
 

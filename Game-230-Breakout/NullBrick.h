@@ -47,7 +47,7 @@ public:
 		cloakInterval = Null_Cloak_Interval + rand() % Null_Cloak_Margin;
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p);
+	virtual void act(Player &p);
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
@@ -106,7 +106,7 @@ Interaction NullBrick::interact(Ball &ball) {
 	return i;
 }
 
-int NullBrick::act(Player &p) {
+void NullBrick::act(Player &p) {
 	if (cloakActivated) {
 		if (cloakCounter == 255) {
 			darkening = false;
@@ -145,7 +145,6 @@ int NullBrick::act(Player &p) {
 			cloakActivated = true;
 		}
 	}
-	return 0;
 }
 
 void NullBrick::upgradeBricks(bool upgrade) {

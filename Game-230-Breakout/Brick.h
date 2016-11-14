@@ -49,7 +49,7 @@ public:
 		setFillColor(Play_Area_Color);
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p) { return 0; }
+	virtual void act(Player &p) {}
 	virtual void upgradeBricks(bool b) {}
 	virtual void setPosition(float x, float y);
 	virtual void setDisplay();

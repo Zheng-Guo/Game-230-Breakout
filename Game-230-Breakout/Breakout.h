@@ -29,10 +29,11 @@ private:
 	shared_ptr<Level> currentLevel;
 	Player player;
 	Ball ball;
-	Text score, lives,message,levelName,restartInstruction;
+	Text score, lives,message,levelName,restartInstruction,powerUpLabel;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
+	float ballAcceleration;
 	bool gameStart,gameOver,levelEnd;
 	bool paddleStunned;
 	void resetPlayer();
@@ -47,6 +48,7 @@ public:
 		playArea(Play_Area_Width, Play_Area_Height),
 		player(Vector2f(Play_Area_X_Position + Play_Area_Width / 2 - Paddle_Width / 2, Play_Area_Y_Position + Play_Area_Height - Paddle_Height), Play_Area_X_Position, Play_Area_X_Position + Play_Area_Width),
 		ball(Ball_Radius),
+		ballAcceleration(0),
 		gameStart(false),
 		gameOver(false),
 		paddleStunned(false){
@@ -91,15 +93,14 @@ public:
 		restartInstruction.setCharacterSize(Stat_Character_Size);
 		restartInstruction.setFillColor(Color::Red);
 		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
+		powerUpLabel.setString("Power Up:");
+		powerUpLabel.setFont(font);
+		powerUpLabel.setCharacterSize(Stat_Character_Size);
+		powerUpLabel.setFillColor(Color::Blue);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
 		currentLevel->setExplosionSpeed(Explosion_Speed);
 		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
-		//player.addPowerUp(Element::Water);
-		//player.addPowerUp(Element::Thunder);
-		//player.addPowerUp(Element::Wind);
-		//player.addPowerUp(Element::Earth);
-		//player.addPowerUp(Element::Fire);
 		resetPlayer();
 	}
 	void startGame();
@@ -131,12 +132,14 @@ void Breakout::resetGame() {
 	ss.str("");
 	ss << "Lives: " << player.getLives();
 	lives.setString(ss.str());
+	ballAcceleration = 0;
 }
 
 void Breakout::nextLevel() {
 	resetPlayer();
 	player.resetPowerUps();
 	currentLevel = levelManager.getNextLevel();
+	ballAcceleration += Ball_Next_Level_Acceleration;
 }
 
 void Breakout::startGame() {
@@ -161,7 +164,7 @@ void Breakout::startGame() {
 			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart&&!loseLife) {
 				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
 				ball.setXSpeed(initialBallXSpeed);
-				ball.setYSpeed(Ball_Initial_Speed);
+				ball.setYSpeed(Ball_Initial_Speed+ballAcceleration);
 				gameStart = true;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Space) && gameOver) {
@@ -361,9 +364,8 @@ void Breakout::startGame() {
 			window.draw(c);
 		}
 		window.draw(player.getSelectedPowerUpDescription());
-		//PowerUp p(Element::Earth);
-		//p.setPosition(200, 80);
-		//window.draw(p);
+		powerUpLabel.setPosition(Power_Up_Label_X, Play_Area_Height- player.getAcquiaredPowerUps().size()*Power_Up_Display_Interval - 50);
+		window.draw(powerUpLabel);
 		window.display();
 	}
 }
