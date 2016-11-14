@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 #include <vector>
 #include <memory>
 #include <cstdlib>
@@ -25,6 +26,8 @@ protected:
 	RectangleShape animation;
 	vector<Texture> animationTextures;
 	RectangleShape background;
+	static SoundBuffer crackBuffer,breakBuffer;
+	static Sound crackSound,breakSound;
 	int durability;
 	int score;
 	bool isEmpty,waterUpgraded, earthUpgraded, windUpgraded,nullUpgraded;
@@ -76,6 +79,7 @@ public:
 	void setNullUpgrade(bool b) { nullUpgraded = b; }
 	virtual void breakBrick() { durability = 0; setTexture(nullptr); }
 	static void loadTextures();
+	static void loadSound();
 };
 
 Texture Brick::textures[4];
@@ -85,6 +89,16 @@ void Brick::loadTextures() {
 	textures[1].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 1.png");
 	textures[2].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 2.png");
 	textures[3].loadFromFile(string(Texture_Folder) + '/' + string(Texture_Brick_Subfolder) + "/Brick cracked 3.png");
+}
+
+SoundBuffer Brick::crackBuffer, Brick::breakBuffer;
+Sound Brick::crackSound, Brick::breakSound;
+
+void Brick::loadSound() {
+	crackBuffer.loadFromFile(Audio_Folder + string("/crack.wav"));
+	breakBuffer.loadFromFile(Audio_Folder + string("/break.wav"));
+	crackSound.setBuffer(crackBuffer);
+	breakSound.setBuffer(breakBuffer);
 }
 
 Interaction Brick::bounce(Ball &ball) {
@@ -192,6 +206,10 @@ Interaction Brick::interact(Ball &ball) {
 			setTexture(nullptr);
 			i.score = score;
 		}
+		if (durability > 0)
+			crackSound.play();
+		else
+			breakSound.play();
 	}
 	return i;
 }

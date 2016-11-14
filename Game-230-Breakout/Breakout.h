@@ -24,6 +24,8 @@ private:
 	RectangleShape blackCurtain;
 	RectangleShape redFlash;
 	RectangleShape powerUpSelectionHightlight;
+	SoundBuffer levelClearedBuffer;
+	Sound levelCleardSound;
 	PlayArea playArea;
 	LevelManager levelManager;
 	shared_ptr<Level> currentLevel;
@@ -63,6 +65,8 @@ public:
 		redFlash.setPosition(Play_Area_X_Position, Play_Area_Y_Position);
 		playArea.setPosition(Vector2f(Play_Area_X_Position, Play_Area_Y_Position));
 		player.setPaddleColor(Paddle_Normal_Color);
+		levelClearedBuffer.loadFromFile(Audio_Folder + string("/levelCleared.wav"));
+		levelCleardSound.setBuffer(levelClearedBuffer);
 		font.loadFromFile("Tinos-Regular.ttf");
 		ostringstream ss;
 		ss << "Score: " << player.getScore();
@@ -98,6 +102,7 @@ public:
 		powerUpLabel.setCharacterSize(Stat_Character_Size);
 		powerUpLabel.setFillColor(Color::Blue);
 		Brick::loadTextures();
+		Brick::loadSound();
 		currentLevel = levelManager.getFirstLevel();
 		currentLevel->setExplosionSpeed(Explosion_Speed);
 		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
@@ -231,8 +236,6 @@ void Breakout::startGame() {
 				}
 			}
 			else if (!levelEnd) {
-				if (ball.getRadius() != ballradius)
-					cout << "Ball size changed: " << ball.getRadius() << endl;
 				ball.move();
 				int i = playArea.interact(ball);
 				if (i == 1) {
@@ -273,6 +276,7 @@ void Breakout::startGame() {
 					score.setString(ss.str());
 				}
 				if (currentLevel->allClear()) {
+					levelCleardSound.play();
 					endBufferTime = 0;
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
@@ -306,30 +310,30 @@ void Breakout::startGame() {
 			}
 			else {
 				++endBufferTime;
-				if (endBufferTime <= Refresh_Frequency * 2) {
+				if (endBufferTime <= Refresh_Frequency * 5) {
 					message.setString("All Clear");
 				}
-				else if (endBufferTime <= Refresh_Frequency / 2 * 5) {
+				else if (endBufferTime <= Refresh_Frequency / 2 * 11) {
 					message.setString("");
 					float y = blackCurtain.getSize().y;
-					float x = Play_Area_Width / (Refresh_Frequency / 2)*(endBufferTime-Refresh_Frequency*2);
+					float x = Play_Area_Width / (Refresh_Frequency / 2)*(endBufferTime-Refresh_Frequency*5);
 					blackCurtain.setSize(Vector2f(x, y));
 				}
-				else if (endBufferTime <= Refresh_Frequency * 3) {
+				else if (endBufferTime <= Refresh_Frequency * 6) {
 					float x = blackCurtain.getSize().x;
-					float y = (Play_Area_Height - Black_Curtain_Initial_Height) / Refresh_Frequency*(endBufferTime - Refresh_Frequency /2*5) * 2 + Black_Curtain_Initial_Height;
+					float y = (Play_Area_Height - Black_Curtain_Initial_Height) / Refresh_Frequency*(endBufferTime - Refresh_Frequency /2*11) * 2 + Black_Curtain_Initial_Height;
 					blackCurtain.setSize(Vector2f(x, y));
 					blackCurtain.setPosition(blackCurtain.getPosition().x, Play_Area_Height / 2 - blackCurtain.getSize().y / 2);
 				}
-				else if (endBufferTime <= Refresh_Frequency * 4) {
-					float x= Play_Area_Width / Refresh_Frequency *(Refresh_Frequency * 4-endBufferTime);
+				else if (endBufferTime <= Refresh_Frequency * 7) {
+					float x= Play_Area_Width / Refresh_Frequency *(Refresh_Frequency * 7-endBufferTime);
 					float y = blackCurtain.getSize().y;
 					blackCurtain.setSize(Vector2f(x, y));
 				}
-				if (endBufferTime == Refresh_Frequency * 3) {
+				if (endBufferTime == Refresh_Frequency * 6) {
 					nextLevel();
 				}
-				if (endBufferTime == Refresh_Frequency * 4) {
+				if (endBufferTime == Refresh_Frequency * 7) {
 					levelEnd = false;
 					levelStart = true;
 					blackCurtain.setPosition(Play_Area_X_Position, Play_Area_Height / 2 - Black_Curtain_Initial_Height / 2);

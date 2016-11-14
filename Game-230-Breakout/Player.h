@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 #include "GameConstants.h"
 #include "Paddle.h"
 
@@ -17,6 +18,8 @@ private:
 	vector<CircleShape> acquiredPowerUps;
 	vector<Element> powerUps;
 	vector<Text> powerUpDescriptions;
+	SoundBuffer loseBuffer;
+	Sound loseSound;
 	Font font;
 	int powerUpSelected;
 	int score;
@@ -57,6 +60,8 @@ public:
 		ss << Texture_Folder << '/' << Texture_PowerUp_Subfolder << "/Thunder powerup.png";
 		texture.loadFromFile(ss.str());
 		powerUpTextures.push_back(texture);
+		loseBuffer.loadFromFile(Audio_Folder + string("/lose.wav"));
+		loseSound.setBuffer(loseBuffer);
 		font.loadFromFile("Tinos-Regular.ttf");
 		resetPowerUps();
 		srand(time(NULL));
@@ -67,7 +72,7 @@ public:
 	void resetScore() { score = 0; }
 	void scorePoint(int s) { score += s; }
 	int getScore() { return score; }
-	void lostLife() { --life; }
+	void lostLife() { loseSound.play(); --life; }
 	int getLives() { return life; }
 	void resetLives() { life = Player_Initial_Lives; }
 	void moveLeft();

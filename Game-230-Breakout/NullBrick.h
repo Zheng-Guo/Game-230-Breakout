@@ -12,6 +12,8 @@ using namespace std;
 
 class NullBrick :public Brick {
 private:
+	SoundBuffer explodeBuffer;
+	Sound explodeSound;
 	vector<shared_ptr<Brick>> &bricks;
 	const int animationRefreshRate;
 	shared_ptr<VertexArray> colourShiftPanel;
@@ -45,6 +47,8 @@ public:
 		(*colourShiftPanel)[3].color = Color(rand() % 255, rand() % 255, rand() % 255);
 		initializeColourShift();
 		cloakInterval = Null_Cloak_Interval + rand() % Null_Cloak_Margin;
+		explodeBuffer.loadFromFile(Audio_Folder + string("/explode.wav"));
+		explodeSound.setBuffer(explodeBuffer);
 	}
 	virtual Interaction interact(Ball &ball);
 	virtual void act(Player &p);
@@ -88,7 +92,7 @@ Interaction NullBrick::interact(Ball &ball) {
 			damage = 1;
 		else
 			damage = 0;
-		durability -= damage;
+		durability -= 16;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);
 		else if (durability > Brick_Duribility / 2)
@@ -102,6 +106,10 @@ Interaction NullBrick::interact(Ball &ball) {
 			setTexture(nullptr);
 			i.score = score;
 		}
+		if (durability > 0)
+			crackSound.play();
+		else
+			explodeSound.play();
 	}
 	return i;
 }

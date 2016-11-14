@@ -115,6 +115,10 @@ Interaction ThunderBrick::interact(Ball &ball) {
 			breakBrick();
 			i.score = score;
 		}
+		if (durability > 0)
+			crackSound.play();
+		else
+			breakSound.play();
 	}
 	return i;
 }
