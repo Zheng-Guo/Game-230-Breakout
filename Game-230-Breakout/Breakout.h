@@ -95,11 +95,11 @@ public:
 		currentLevel = levelManager.getFirstLevel();
 		currentLevel->setExplosionSpeed(Explosion_Speed);
 		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
-		player.addPowerUp(Element::Water);
-		player.addPowerUp(Element::Thunder);
-		player.addPowerUp(Element::Wind);
-		player.addPowerUp(Element::Earth);
-		player.addPowerUp(Element::Fire);
+		//player.addPowerUp(Element::Water);
+		//player.addPowerUp(Element::Thunder);
+		//player.addPowerUp(Element::Wind);
+		//player.addPowerUp(Element::Earth);
+		//player.addPowerUp(Element::Fire);
 		resetPlayer();
 	}
 	void startGame();
@@ -120,6 +120,7 @@ void Breakout::resetPlayer() {
 
 void Breakout::resetGame() {
 	resetPlayer();
+	player.resetPowerUps();
 	gameOver = false;
 	currentLevel = levelManager.getFirstLevel();
 	player.resetScore();
@@ -134,6 +135,7 @@ void Breakout::resetGame() {
 
 void Breakout::nextLevel() {
 	resetPlayer();
+	player.resetPowerUps();
 	currentLevel = levelManager.getNextLevel();
 }
 
@@ -260,7 +262,7 @@ void Breakout::startGame() {
 						player.moveRight();
 				}
 				player.interact(ball);
-				int s = currentLevel->interact(ball);
+				int s = currentLevel->interact(ball,player);
 				if (s > 0) {
 					player.scorePoint(s);
 					ostringstream ss;
@@ -359,6 +361,9 @@ void Breakout::startGame() {
 			window.draw(c);
 		}
 		window.draw(player.getSelectedPowerUpDescription());
+		//PowerUp p(Element::Earth);
+		//p.setPosition(200, 80);
+		//window.draw(p);
 		window.display();
 	}
 }

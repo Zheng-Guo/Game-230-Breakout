@@ -14,6 +14,7 @@
 #include "FireBrick.h"
 #include "ThunderBrick.h"
 #include "NullBrick.h"
+#include "PowerUp.h"
 
 using namespace std;
 using namespace sf;
@@ -28,6 +29,7 @@ private:
 	vector<shared_ptr<ThunderBall>> thunderballs;
 	vector<shared_ptr<VertexArray>> colourShiftPanels;
 	shared_ptr<NullBrick> bossBrick;
+	vector<shared_ptr<PowerUp>> powerUps;
 	Texture explosionTexture;
 	RectangleShape explosion;
 	string levelName;
@@ -38,7 +40,9 @@ private:
 	int numberOfBricks;
 	bool bossFight;
 	bool bossExploded;
+	bool isWaterBrickPresent, isFireBrickPresent, isEarthBrickPresent, isWindBrickPresent, isThunderBrickPresent;
 	void setEdgeExposure();
+	void setPowerUps();
 public:
 	Level():explosion(Vector2f(Play_Area_Height*2,Play_Area_Height*2)),
 	initialNumberOfBricks(0),
@@ -48,14 +52,19 @@ public:
 	explosionTextureY(0),
 	explosionSpeed(0),
 	bossFight(false),
-	bossExploded(false){	
+	bossExploded(false),
+	isWaterBrickPresent(false),
+	isFireBrickPresent(false), 
+	isEarthBrickPresent(false), 
+	isWindBrickPresent(false), 
+	isThunderBrickPresent(false) {
 		explosionTexture.loadFromFile(string(Texture_Folder) + '/' + Texture_Brick_Subfolder + '/' + "explosion.png");
 		explosion.setTexture(&explosionTexture);
 		explosion.setTextureRect(IntRect(0, 0, 256, 256));
 	}
 	void loadConfig(string fileName);
 	void resetBricks();
-	int interact(Ball &ball);
+	int interact(Ball &ball,Player &player);
 	int act(Player &p);
 	RectangleShape getExplosion() { return explosion; }
 	void explode();
@@ -96,6 +105,51 @@ void Level::setEdgeExposure() {
 	}
 }
 
+void Level::setPowerUps() {
+	powerUps.clear();
+	int brickIndices[] = { -1,-1,-1,-1,-1 }, i = 0;
+	int powerUpSpawnRange = bricks.size() > Number_Of_Brick_Per_Row * 2 ? Number_Of_Brick_Per_Row * 2 : bricks.size();
+	while (i < 5) {
+		int brickIndex = bricks.size() - 1 - rand() % powerUpSpawnRange;
+		int j = 0;
+		bool isUnsuitable = false;
+		while (j<5) {
+			if (!bricks[brickIndex]->isNormal() || bricks[brickIndex]->isBroken() || brickIndices[j] == brickIndex)
+				isUnsuitable = true;
+			++j;
+		}
+		if (!isUnsuitable) {
+			brickIndices[i] = brickIndex;
+			++i;
+		}
+	}
+	if (isWaterBrickPresent) {
+		shared_ptr<PowerUp> p = make_shared<PowerUp>(Element::Earth);
+		p->setBrickAbove(bricks[brickIndices[0]]);
+		powerUps.push_back(p);
+	}
+	if (isFireBrickPresent) {
+		shared_ptr<PowerUp> p = make_shared<PowerUp>(Element::Water);
+		p->setBrickAbove(bricks[brickIndices[1]]);
+		powerUps.push_back(p);
+	}
+	if (isEarthBrickPresent) {
+		shared_ptr<PowerUp> p = make_shared<PowerUp>(Element::Thunder);
+		p->setBrickAbove(bricks[brickIndices[2]]);
+		powerUps.push_back(p);
+	}
+	if (isWindBrickPresent) {
+		shared_ptr<PowerUp> p = make_shared<PowerUp>(Element::Fire);
+		p->setBrickAbove(bricks[brickIndices[3]]);
+		powerUps.push_back(p);
+	}
+	if (isThunderBrickPresent) {
+		shared_ptr<PowerUp> p = make_shared<PowerUp>(Element::Wind);
+		p->setBrickAbove(bricks[brickIndices[4]]);
+		powerUps.push_back(p);
+	}
+}
+
 void Level::loadConfig(string fileName) {
 	ifstream ifs(fileName);
 	getline(ifs,levelName);
@@ -108,11 +162,11 @@ void Level::loadConfig(string fileName) {
 		switch (brickType) {
 		case Element::None:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0,true); brick->setTexture(nullptr);  break;
 		case Element::Normal:brick = make_shared<Brick>(Brick_Width, Brick_Height, Brick_Duribility, Normal_Brick_Score); break;
-		case Element::Water:brick= make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
-		case Element::Fire:b = make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); fireballs.push_back(b->getFireball()); brick = b; break;
-		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
-		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); break;
-		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; break;
+		case Element::Water:brick = make_shared<WaterBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); isWaterBrickPresent = true; break;
+		case Element::Fire:b = make_shared<FireBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); fireballs.push_back(b->getFireball()); brick = b; isFireBrickPresent = true; break;
+		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); isEarthBrickPresent = true; break;
+		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); isWindBrickPresent = true; break;
+		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; isThunderBrickPresent = true; break;
 		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, Brick_Duribility, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; bossBrick = b3; bossFight = true; break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
@@ -133,6 +187,7 @@ void Level::loadConfig(string fileName) {
 	if (bossFight) {
 		explosion.setPosition(bossBrick->getPosition().x+Brick_Width/2-explosion.getSize().x/2,bossBrick->getPosition().y+Brick_Height/2 - explosion.getSize().y / 2);
 	}
+	setPowerUps();
 	setEdgeExposure();
 }
 
@@ -144,10 +199,11 @@ void Level::resetBricks() {
 	for (shared_ptr<Brick> b : bricks)
 		if(!b->isNull())
 			b->upgradeBricks(true);
+	setPowerUps();
 	setEdgeExposure();
 }
 
-int Level::interact(Ball &ball) {
+int Level::interact(Ball &ball,Player &player) {
 	float xSpeed=ball.getVelocity().x, ySpeed=ball.getVelocity().y,xPosition=ball.getPosition().x,yPosition=ball.getPosition().y;
 	int score=0;
 	for (shared_ptr<Brick> b : bricks) {
@@ -169,6 +225,9 @@ int Level::interact(Ball &ball) {
 	ball.setYSpeed(ySpeed);
 	ball.setPosition(xPosition, yPosition);
 	setEdgeExposure();
+	for (shared_ptr<PowerUp> p : powerUps) {
+		p->interact(ball, player);
+	}
 	return score;
 }
 
@@ -204,6 +263,10 @@ void Level::render(RenderWindow &window) {
 	}
 	for (shared_ptr<Brick> b : bricks) {
 		window.draw(*b);
+	}
+	for (shared_ptr<PowerUp> p : powerUps) {
+		if(p->isExposed())
+			window.draw(*p);
 	}
 	for (shared_ptr<FireBall> f : fireballs) {
 		if(f->isFired())

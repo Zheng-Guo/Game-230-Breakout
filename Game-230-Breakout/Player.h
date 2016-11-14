@@ -58,17 +58,7 @@ public:
 		texture.loadFromFile(ss.str());
 		powerUpTextures.push_back(texture);
 		font.loadFromFile("Tinos-Regular.ttf");
-		CircleShape noPowerUp(Power_Up_Display_Radius);
-		noPowerUp.setPosition(Power_Up_Display_X, Power_Up_Display_Y);
-		acquiredPowerUps.push_back(noPowerUp);
-		powerUps.push_back(Element::Normal);
-		Text t;
-		t.setString("Normal"); 
-		t.setFont(font); 
-		t.setCharacterSize(Stat_Character_Size); 
-		t.setFillColor(Color::Blue); 
-		t.setPosition(Power_Up_Display_X + 70, noPowerUp.getPosition().y + 20);
-		powerUpDescriptions.push_back(t);
+		resetPowerUps();
 		srand(time(NULL));
 	}
 	Paddle getPaddle() { return paddle; }
@@ -94,7 +84,7 @@ public:
 	bool isPoweredUp() { return poweredUp; }
 	bool isPowerUpUsed() { return powerUpUsed; }
 	vector<CircleShape> getAcquiaredPowerUps() { return acquiredPowerUps; }
-	void usePowerUp();
+	void resetPowerUps();
 };
 
 void Player::moveLeft() {
@@ -116,17 +106,6 @@ void Player::moveRight() {
 void Player::interact(Ball &ball) {
 	if(paddle.interact(ball))
 		ball.setPowerUpType(powerUps[powerUpSelected]);
-	if (powerUpUsed) {//Throw only one paddle at a time.
-
-	}
-}
-
-
-void Player::usePowerUp() {
-	if (poweredUp&&!powerUpUsed) {//If power up obtained and not yet used.
-		
-		powerUpUsed = true;
-	}
 }
 
 void Player::addPowerUp(Element p) {
@@ -139,4 +118,21 @@ void Player::addPowerUp(Element p) {
 	case Element::Wind:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[3]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Wind); t.setString("Wind"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
 	case Element::Thunder:c = CircleShape(Power_Up_Display_Radius); c.setPosition(Power_Up_Display_X, Power_Up_Display_Y - Power_Up_Display_Interval*acquiredPowerUps.size()); c.setTexture(&powerUpTextures[4]); acquiredPowerUps.push_back(c); powerUps.push_back(Element::Thunder); t.setString("Thunder"); t.setFont(font); t.setCharacterSize(Stat_Character_Size); t.setFillColor(Color::Blue); t.setPosition(Power_Up_Display_X + 70, c.getPosition().y + 20); powerUpDescriptions.push_back(t); break;
 	}
+}
+
+void Player::resetPowerUps() {
+	acquiredPowerUps.clear();
+	powerUps.clear();
+	powerUpDescriptions.clear();
+	CircleShape noPowerUp(Power_Up_Display_Radius);
+	noPowerUp.setPosition(Power_Up_Display_X, Power_Up_Display_Y);
+	acquiredPowerUps.push_back(noPowerUp);
+	powerUps.push_back(Element::Normal);
+	Text t;
+	t.setString("Normal");
+	t.setFont(font);
+	t.setCharacterSize(Stat_Character_Size);
+	t.setFillColor(Color::Blue);
+	t.setPosition(Power_Up_Display_X + 70, noPowerUp.getPosition().y + 20);
+	powerUpDescriptions.push_back(t);
 }

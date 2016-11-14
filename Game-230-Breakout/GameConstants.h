@@ -84,4 +84,6 @@ const float Power_Up_Display_Interval = 80;
 const int Explosion_Texture_Row_Number = 6;
 const int Explosion_Texture_Column_Number = 8;
 const int Explosion_Speed = Refresh_Frequency / 20;
+const int Power_Up_Item_Width = 60;
+const int Power_Up_Item_Height = 60;
 enum Element{None,Normal,Water,Fire,Earth,Wind,Thunder,Null};
