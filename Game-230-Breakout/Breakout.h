@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio.hpp>
-#include <iostream>
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
@@ -31,16 +30,21 @@ private:
 	shared_ptr<Level> currentLevel;
 	Player player;
 	Ball ball;
-	Text score, lives,message,levelName,restartInstruction,powerUpLabel,startInstruction,helpInstruction;
+	Text score, lives,message,levelName,restartInstruction,powerUpLabel,startInstruction,helpInstruction,helpControl1,helpControl2;
 	Font font;
 	Clock clock;
 	Time time1, time2, time3;
+	vector<Text> helpText;
+	int helpStartLineNumber, helpEndLineNumber;
 	float ballAcceleration;
+	float helpXPosition,helpYPosition;
 	bool gameStart,gameOver,levelEnd;
 	bool paddleStunned;
 	void resetPlayer();
 	void resetGame();
 	void nextLevel();
+	void previousHelpPage();
+	void nextHelpPage();
 public:
 	Breakout() :window(VideoMode(Window_Width, Window_Height), "Attack on Bricks", Style::Close | Style::Titlebar),
 		statArea(Vector2f(Window_Width - Play_Area_Width, Window_Height)),
@@ -111,6 +115,26 @@ public:
 		helpInstruction.setCharacterSize(Stat_Character_Size);
 		helpInstruction.setFillColor(Color::Red);
 		helpInstruction.setPosition(Message_X_Position, Message_Y_Position + 130);
+		helpControl1.setString("Press Up/Down arrow key to scroll up/down the help text.");
+		helpControl1.setFont(font);
+		helpControl1.setCharacterSize(Stat_Character_Size);
+		helpControl1.setFillColor(Color::Red);
+		helpControl2.setString("Press H to exit the help.");
+		helpControl2.setFont(font);
+		helpControl2.setCharacterSize(Stat_Character_Size);
+		helpControl2.setFillColor(Color::Red);
+		ifstream ifs(string(Config_Folder) + '/' + string(Help_File_Name));
+		string helpLine;
+		while (getline(ifs, helpLine)) {
+			Text text;
+			text.setString(helpLine);
+			text.setFont(font);
+			text.setCharacterSize(Help_Character_Size);
+			text.setFillColor(Color::White);
+			helpText.push_back(text);
+		}
+		helpStartLineNumber = 0;
+		helpEndLineNumber = helpText.size() > Number_Of_Help_Lines_Per_Page?Number_Of_Help_Lines_Per_Page:helpText.size();
 		Brick::loadTextures();
 		Brick::loadSound();
 		currentLevel = levelManager.getFirstLevel();
@@ -264,6 +288,10 @@ void Breakout::startGame() {
 					initializeHelpTime = 0;
 					initializeHelp = false;
 					displayHelpText = true;
+					helpXPosition = blackCurtain.getPosition().x +10;
+					helpYPosition = blackCurtain.getPosition().y;
+					helpControl1.setPosition(Message_X_Position, blackCurtain.getPosition().y + blackCurtain.getSize().y - 60);
+					helpControl2.setPosition(Message_X_Position, blackCurtain.getPosition().y + blackCurtain.getSize().y - 35);
 				}
 			}
 			else if (exitHelp) {
@@ -416,6 +444,15 @@ void Breakout::startGame() {
 		}
 		if (levelEnd||displayHelp)
 			window.draw(blackCurtain);
+		if (displayHelpText&&helpText.size()>0) {
+			for (int i = helpStartLineNumber; i < helpEndLineNumber; i++) {
+				Text t = helpText[i];
+				t.setPosition(helpXPosition, helpYPosition + 20 * (i - helpStartLineNumber));
+				window.draw(t);
+			}
+			window.draw(helpControl1);
+			window.draw(helpControl2);
+		}
 		if (gameOver) 
 			window.draw(restartInstruction);
 		if (loseLife)
