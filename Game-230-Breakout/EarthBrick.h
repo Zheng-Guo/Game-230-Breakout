@@ -28,6 +28,7 @@ public:
 	virtual bool isNormal() { return false; }
 	virtual void animate() {}
 	virtual bool isNull() { return false; }
+	virtual void breakBrick();
 };
 
 Interaction EarthBrick::interact(Ball &ball) {
@@ -47,10 +48,8 @@ Interaction EarthBrick::interact(Ball &ball) {
 		else if (durability >0)
 			setTexture(&textures[3]);
 		else {
-			durability = 0;
-			setTexture(nullptr);
+			breakBrick();
 			i.score = score;
-			upgradeBricks(false);
 		}
 	}
 	return i;
@@ -81,4 +80,10 @@ void EarthBrick::setDisplay() {
 		durability = Brick_Duribility;
 		setTexture(&textures[0]);
 	}
+}
+
+void EarthBrick::breakBrick() {
+	durability = 0;
+	setTexture(nullptr);
+	upgradeBricks(false);
 }

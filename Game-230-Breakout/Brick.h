@@ -74,6 +74,7 @@ public:
 	void setWindUpgrade(bool b) { windUpgraded = b; }
 	bool getWindUpgrade() { return windUpgraded; }
 	void setNullUpgrade(bool b) { nullUpgraded = b; }
+	virtual void breakBrick() { durability = 0; setTexture(nullptr); }
 	static void loadTextures();
 };
 

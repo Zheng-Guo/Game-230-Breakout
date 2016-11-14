@@ -84,7 +84,8 @@ Interaction NullBrick::interact(Ball &ball) {
 	Interaction i = bounce(ball);
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
-		int damage = Brick_Duribility / 16;
+		//int damage = Brick_Duribility / 16;
+		int damage = Brick_Duribility;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);

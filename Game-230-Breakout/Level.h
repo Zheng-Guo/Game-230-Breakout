@@ -27,21 +27,48 @@ private:
 	vector<shared_ptr<FireBall>> fireballs;
 	vector<shared_ptr<ThunderBall>> thunderballs;
 	vector<shared_ptr<VertexArray>> colourShiftPanels;
+	shared_ptr<NullBrick> bossBrick;
+	Texture explosionTexture;
+	RectangleShape explosion;
 	string levelName;
+	int explosionCounter;
+	int explosionTextureX, explosionTextureY;
+	int explosionSpeed;
 	int initialNumberOfBricks;
 	int numberOfBricks;
+	bool bossFight;
+	bool bossExploded;
 	void setEdgeExposure();
 public:
-	//Level(){}
+	Level():explosion(Vector2f(Play_Area_Height*2,Play_Area_Height*2)),
+	initialNumberOfBricks(0),
+	numberOfBricks(0),
+	explosionCounter(0),
+	explosionTextureX(1),
+	explosionTextureY(0),
+	explosionSpeed(0),
+	bossFight(false),
+	bossExploded(false){	
+		explosionTexture.loadFromFile(string(Texture_Folder) + '/' + Texture_Brick_Subfolder + '/' + "explosion.png");
+		explosion.setTexture(&explosionTexture);
+		explosion.setTextureRect(IntRect(0, 0, 256, 256));
+	}
 	void loadConfig(string fileName);
 	void resetBricks();
 	int interact(Ball &ball);
 	int act(Player &p);
+	RectangleShape getExplosion() { return explosion; }
+	void explode();
 	bool allClear() { return numberOfBricks == 0; }
 	void render(RenderWindow &window);
 	string getLevelName() { return levelName; }
 	void animate();
 	void ceaseFire();
+	bool isBossDefeated() { return bossFight&&bossBrick->isBroken(); }
+	void setExplosionSpeed(int s) { explosionSpeed = s; }
+	void breakAll();
+	void declearDefeat() { numberOfBricks = 0; bossExploded = false; }
+	bool isBossExploded() { return bossExploded; }
 };
 
 void Level::setEdgeExposure() {
@@ -86,7 +113,7 @@ void Level::loadConfig(string fileName) {
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); break;
 		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; break;
-		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, Brick_Duribility, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; break;
+		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, 1, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; bossBrick = b3; bossFight = true; break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
@@ -103,6 +130,9 @@ void Level::loadConfig(string fileName) {
 		}
 		brickGrid.push_back(brickRow);
 	}
+	if (bossFight) {
+		explosion.setPosition(bossBrick->getPosition().x+Brick_Width/2-explosion.getSize().x/2,bossBrick->getPosition().y+Brick_Height/2 - explosion.getSize().y / 2);
+	}
 	setEdgeExposure();
 }
 
@@ -114,6 +144,7 @@ void Level::resetBricks() {
 	for (shared_ptr<Brick> b : bricks)
 		if(!b->isNull())
 			b->upgradeBricks(true);
+	setEdgeExposure();
 }
 
 int Level::interact(Ball &ball) {
@@ -198,5 +229,33 @@ void Level::ceaseFire() {
 	for (shared_ptr<ThunderBall> t : thunderballs) {
 		if (t->isFired())
 			t->setFired(false);
+	}
+}
+
+void Level::breakAll() {
+	for (shared_ptr<Brick> b : bricks) {
+		if (!b->isBrickEmpty())
+			b->breakBrick();
+	}
+}
+
+void Level::explode() {
+	if (!bossExploded) {
+		if (explosionCounter < explosionSpeed) {
+			explosionCounter++;
+		}
+		else {
+			explosionCounter = 0;
+			explosion.setTextureRect(IntRect(explosionTextureX * 256, explosionTextureY * 256, 256, 256));
+			++explosionTextureX;
+			if (explosionTextureX >= Explosion_Texture_Column_Number) {
+				++explosionTextureY;
+				explosionTextureX = 0;
+			}
+			if (explosionTextureY >= Explosion_Texture_Row_Number) {
+				explosionTextureY = 0;
+				bossExploded = true;
+			}
+		}
 	}
 }

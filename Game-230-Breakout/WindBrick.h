@@ -35,6 +35,7 @@ public:
 	virtual void setPosition(float x, float y);
 	virtual void animate();
 	virtual bool isNull() { return false; }
+	virtual void breakBrick();
 };
 
 Interaction WindBrick::interact(Ball &ball) {
@@ -61,11 +62,8 @@ Interaction WindBrick::interact(Ball &ball) {
 		else if (durability >0)
 			setTexture(&textures[3]);
 		else {
-			durability = 0;
-			setTexture(nullptr);
-			animation.setTexture(nullptr);
+			breakBrick();
 			i.score = score;
-			upgradeBricks(false);
 		}
 	}
 	return i;
@@ -113,4 +111,11 @@ void WindBrick::animate() {
 		refreshCounter = 0;
 		animation.rotate(30);
 	}
+}
+
+void WindBrick::breakBrick() {
+	durability = 0;
+	setTexture(nullptr);
+	animation.setTexture(nullptr);
+	upgradeBricks(false);
 }

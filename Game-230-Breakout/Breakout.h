@@ -93,6 +93,7 @@ public:
 		restartInstruction.setPosition(Message_X_Position, Message_Y_Position + 100);
 		Brick::loadTextures();
 		currentLevel = levelManager.getFirstLevel();
+		currentLevel->setExplosionSpeed(Explosion_Speed);
 		powerUpSelectionHightlight.setFillColor(Power_Up_Selection_Hightlight_Color);
 		player.addPowerUp(Element::Water);
 		player.addPowerUp(Element::Thunder);
@@ -137,8 +138,8 @@ void Breakout::nextLevel() {
 }
 
 void Breakout::startGame() {
-	int startBufferTime=0,endBufferTime,redFlashDuration=255,stunnedCounter;
-	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,stued=false;
+	int startBufferTime=0,endBufferTime,redFlashDuration=255,stunnedCounter,explosionCounter=0;
+	bool moveLeft = false, moveRight = false,levelStart=true,loseLife=false,stued=false,bossDefeated=false;
 	float ballradius = ball.getRadius();
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
@@ -172,7 +173,18 @@ void Breakout::startGame() {
 		if (time3.asSeconds() >= Refresh_Interval&&!gameOver) {
 			time1 = time2;
 			currentLevel->animate();
-			if (levelStart) {
+			if (bossDefeated) {
+				currentLevel->explode();
+				++explosionCounter;
+				if (explosionCounter == Refresh_Frequency)
+					currentLevel->breakAll();
+				else if (explosionCounter == Refresh_Frequency*2) {
+					currentLevel->declearDefeat();
+					explosionCounter = 0;
+					bossDefeated = false;
+				}				
+			}
+			else if (levelStart) {
 				++startBufferTime;
 				if (startBufferTime <= Refresh_Frequency / 2) {
 					float y = blackCurtain.getSize().y;
@@ -254,11 +266,14 @@ void Breakout::startGame() {
 					ostringstream ss;
 					ss << "Score: " << player.getScore();
 					score.setString(ss.str());
-				}				
+				}
 				if (currentLevel->allClear()) {
 					endBufferTime = 0;
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
+				}
+				if (currentLevel->isBossDefeated()) {
+					bossDefeated = true;
 				}
 				if (gameStart) {
 					i = currentLevel->act(player);
@@ -333,6 +348,8 @@ void Breakout::startGame() {
 			window.draw(restartInstruction);
 		if (loseLife)
 			window.draw(redFlash);
+		if (bossDefeated&&!currentLevel->isBossExploded())
+			window.draw(currentLevel->getExplosion());
 		window.draw(statArea);
 		window.draw(score);
 		window.draw(lives);

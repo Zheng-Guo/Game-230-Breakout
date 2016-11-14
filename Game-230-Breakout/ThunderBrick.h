@@ -68,6 +68,7 @@ public:
 	virtual bool isNormal() { return false; }
 	virtual void animate();
 	virtual bool isNull() { return false; }
+	virtual void breakBrick();
 	shared_ptr<ThunderBall> getThunderball() { return thunderball; }
 };
 
@@ -88,8 +89,7 @@ Interaction ThunderBrick::interact(Ball &ball) {
 		else if (durability >0)
 			setTexture(&textures[3]);
 		else {
-			durability = 0;
-			setTexture(nullptr);
+			breakBrick();
 			i.score = score;
 		}
 	}
@@ -144,4 +144,9 @@ void ThunderBrick::animate() {
 			currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
 	}
+}
+
+void ThunderBrick::breakBrick() {
+	durability = 0;
+	setTexture(nullptr);
 }

@@ -33,12 +33,13 @@ public:
 		animation.setTexture(&(*currentTexture));
 	}
 	virtual Interaction interact(Ball &ball);
-	virtual int act(Player &p);
+	virtual int act(Player &p) { return 0; }
 	virtual void upgradeBricks(bool upgrade);
 	virtual void setDisplay();
 	virtual bool isNormal() { return false; }
 	virtual void animate();
 	virtual bool isNull() { return false; }
+	virtual void breakBrick();
 };
 
 Interaction WaterBrick::interact(Ball &ball) {
@@ -58,17 +59,11 @@ Interaction WaterBrick::interact(Ball &ball) {
 		else if (durability >0)
 			setTexture(&textures[3]);
 		else {
-			durability = 0;
-			setTexture(nullptr);
+			breakBrick();
 			i.score = score;
-			upgradeBricks(false);
 		}
 	}
 	return i;
-}
-
-int WaterBrick::act(Player &player) {
-	return 0;
 }
 
 void WaterBrick::upgradeBricks(bool upgrade) {
@@ -109,6 +104,11 @@ void WaterBrick::animate() {
 		if (currentTexture == animationTextures.end())
 			currentTexture = animationTextures.begin();
 		animation.setTexture(&(*currentTexture));
-	}
-	
+	}	
+}
+
+void WaterBrick::breakBrick() {
+	durability = 0;
+	setTexture(nullptr);
+	upgradeBricks(false);
 }
