@@ -84,8 +84,10 @@ Interaction NullBrick::interact(Ball &ball) {
 	Interaction i = bounce(ball);
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
-		//int damage = Brick_Duribility / 16;
-		int damage = Brick_Duribility;
+		if (ball.getPowerUpType() == Element::Normal)
+			damage = 1;
+		else
+			damage = 0;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);
@@ -99,7 +101,6 @@ Interaction NullBrick::interact(Ball &ball) {
 			durability = 0;
 			setTexture(nullptr);
 			i.score = score;
-			//upgradeBricks(false);
 		}
 	}
 	return i;

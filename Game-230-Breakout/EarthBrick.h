@@ -32,12 +32,20 @@ public:
 };
 
 Interaction EarthBrick::interact(Ball &ball) {
-	Interaction i = bounce(ball);
+ 	Interaction i = bounce(ball);
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility/4;
-		if (waterUpgraded)
-			damage =1;
+		if (nullUpgraded) {
+			if (ball.getPowerUpType() == Element::Normal)
+				damage = 1;
+			else
+				damage = 0;
+		}
+		else if (ball.getPowerUpType() == Element::Water)
+			damage /= 2;
+		else if (ball.getPowerUpType() == Element::Thunder)
+			damage = Brick_Duribility;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);

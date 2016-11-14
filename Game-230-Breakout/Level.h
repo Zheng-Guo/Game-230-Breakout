@@ -113,7 +113,7 @@ void Level::loadConfig(string fileName) {
 		case Element::Earth:brick = make_shared<EarthBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score,bricks); break;
 		case Element::Wind:brick = make_shared<WindBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); break;
 		case Element::Thunder:b2 = make_shared<ThunderBrick>(Brick_Width, Brick_Height, Brick_Duribility, Element_Brick_Score, bricks); thunderballs.push_back(b2->getThunderball()); brick = b2; break;
-		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, 1, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; bossBrick = b3; bossFight = true; break;
+		case Element::Null:b3 = make_shared<NullBrick>(Brick_Width, Brick_Height, Brick_Duribility, Null_Brick_Score, bricks); colourShiftPanels.push_back(b3->getColourShiftPanel()); brick = b3; bossBrick = b3; bossFight = true; break;
 		default:brick = make_shared<Brick>(Brick_Width, Brick_Height, 0, 0, true); brick->setTexture(nullptr);  break;
 		}
 		brick->setPosition((bricks.size() % Number_Of_Brick_Per_Row)*Brick_Width + Play_Area_X_Position, (bricks.size() / Number_Of_Brick_Per_Row)*Brick_Height);
@@ -125,7 +125,7 @@ void Level::loadConfig(string fileName) {
 	auto ite = bricks.begin();
 	for (int i = 0; ite != bricks.end(); ++i) {
 		vector<shared_ptr<Brick>> brickRow;
-		for (int j = 0; ite != bricks.end(); ++ite, ++j) {
+		for (int j = 0; ite != bricks.end()&&j<Number_Of_Brick_Per_Row; ++ite, ++j) {
 			brickRow.push_back(*ite);
 		}
 		brickGrid.push_back(brickRow);

@@ -77,8 +77,16 @@ Interaction FireBrick::interact(Ball &ball) {
 	int damage = 0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility / 4;
-		if (nullUpgraded)
-			damage = 1;
+		if (nullUpgraded) {
+			if (ball.getPowerUpType() == Element::Normal)
+				damage = 1;
+			else
+				damage = 0;
+		}
+		else if (ball.getPowerUpType() == Element::Wind)
+			damage /= 2;
+		else if (ball.getPowerUpType() == Element::Water)
+			damage = Brick_Duribility;
 		durability -= damage;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);

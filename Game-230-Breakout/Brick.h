@@ -142,15 +142,43 @@ Interaction Brick::interact(Ball &ball) {
 	int damage=0;
 	if (i.xFlip || i.yFlip) {
 		int damage = Brick_Duribility;
-		if (waterUpgraded)
-			damage /= 2;
-		if (earthUpgraded)
-			damage /= 2;
-		if (windUpgraded)
-			damage /= 2;
-		if (nullUpgraded)
-			damage = 1;
-		durability -= damage;
+		bool instantKill = false;
+		if (nullUpgraded) {
+			if (ball.getPowerUpType() == Element::Normal)
+				damage = 1;
+			else
+				damage = 0;
+		}
+		else {
+			if (waterUpgraded) {
+				if (ball.getPowerUpType() == Element::Fire)
+					damage /= 4;
+				else if (ball.getPowerUpType() == Element::Earth)
+					instantKill = true;
+				else
+					damage /= 2;
+			}
+			if (earthUpgraded) {
+				if (ball.getPowerUpType() == Element::Water)
+					damage /= 4;
+				else if (ball.getPowerUpType() == Element::Thunder)
+					instantKill = true;
+				else
+					damage /= 2;
+			}
+			if (windUpgraded) {
+				if (ball.getPowerUpType() == Element::Thunder)
+					damage /= 4;
+				else if (ball.getPowerUpType() == Element::Fire)
+					instantKill = true;
+				else
+					damage /= 2;
+			}
+		}
+		if (!instantKill)
+			durability -= damage;
+		else
+			durability = 0;
 		if (durability > Brick_Duribility / 4 * 3)
 			setTexture(&textures[0]);
 		else if (durability > Brick_Duribility / 2)
