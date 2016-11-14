@@ -134,7 +134,7 @@ public:
 			helpText.push_back(text);
 		}
 		helpStartLineNumber = 0;
-		helpEndLineNumber = helpText.size() > Number_Of_Help_Lines_Per_Page?Number_Of_Help_Lines_Per_Page:helpText.size();
+		helpEndLineNumber = helpText.size() > Number_Of_Help_Lines_Per_Page?Number_Of_Help_Lines_Per_Page-1:helpText.size()-1;
 		Brick::loadTextures();
 		Brick::loadSound();
 		currentLevel = levelManager.getFirstLevel();
@@ -174,6 +174,20 @@ void Breakout::resetGame() {
 	ballAcceleration = 0;
 }
 
+void Breakout::previousHelpPage() {
+	if (helpStartLineNumber > 0) {
+		helpEndLineNumber = helpStartLineNumber - 1;
+		helpStartLineNumber = helpStartLineNumber - Number_Of_Help_Lines_Per_Page;
+	}
+}
+
+void Breakout::nextHelpPage() {
+	if (helpStartLineNumber+Number_Of_Help_Lines_Per_Page < helpText.size()) {
+		helpStartLineNumber += Number_Of_Help_Lines_Per_Page;
+		helpEndLineNumber = helpEndLineNumber + Number_Of_Help_Lines_Per_Page < helpText.size() ? helpEndLineNumber + Number_Of_Help_Lines_Per_Page : helpText.size() - 1;
+	}
+}
+
 void Breakout::nextLevel() {
 	resetPlayer();
 	player.resetPowerUps();
@@ -200,6 +214,10 @@ void Breakout::startGame() {
 				player.nextPowerUp();
 			if (Keyboard::isKeyPressed(Keyboard::Down) && gameStart)
 				player.previousPowerUp();
+			if (Keyboard::isKeyPressed(Keyboard::Up) && displayHelpText)
+				previousHelpPage();
+			if (Keyboard::isKeyPressed(Keyboard::Down) && displayHelpText)
+				nextHelpPage();
 			if (Keyboard::isKeyPressed(Keyboard::Space) && !levelStart && !gameStart&&!loseLife&&!displayHelp) {
 				int initialBallXSpeed = rand() % 2 == 0 ? Ball_Initial_Speed:-Ball_Initial_Speed;
 				ball.setXSpeed(initialBallXSpeed);
@@ -311,6 +329,8 @@ void Breakout::startGame() {
 					exitHelpTime = 0;
 					exitHelp = false;
 					displayHelp = false;
+					helpStartLineNumber = 0;
+					helpEndLineNumber = Number_Of_Help_Lines_Per_Page - 1;
 				}
 			}
 			else if (loseLife) {
@@ -445,7 +465,7 @@ void Breakout::startGame() {
 		if (levelEnd||displayHelp)
 			window.draw(blackCurtain);
 		if (displayHelpText&&helpText.size()>0) {
-			for (int i = helpStartLineNumber; i < helpEndLineNumber; i++) {
+			for (int i = helpStartLineNumber; i <= helpEndLineNumber; i++) {
 				Text t = helpText[i];
 				t.setPosition(helpXPosition, helpYPosition + 20 * (i - helpStartLineNumber));
 				window.draw(t);

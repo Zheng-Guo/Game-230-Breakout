@@ -1,65 +1,73 @@
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+Welcome to Attack on Bricks, one of the world's weirdest veriation of Breakout! 
 
-eeeeeeeee
-ff fff fffff
-ggg
+In this game, the battle is not limited just between the ball and the bricks, but also 
+the elements, which are Water, Fire, Earth, Wind and Thunder.
 
-eee
+The basic control is:
+press Left/Right arrow keys to navigate the paddle to the left/right of the screen;
+press Up/Down arrow key to select the power up to be equiped to the ball.
 
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+The core gameplay is the same as all other Breakout games: to break all the bricks on
+the screen with the ball and to avoid having the ball fall off the bottom of the screen.
+With each brick broken, a certain amount of score is awarded to the player. When the 
+ball flys out of the play area the player loses a life and there are three lives in 
+total.
 
-eeeeeeeee
-ff fff fffff
-ggg
+However, some of the bricks are bestowed with element power, which means that they 
+could alter the gameplay dramatically.
 
-eee
+Water Bricks form a cushion around all the bricks on the same column with it. Any 
+ordinary bricks protected by such cushion receive only half the amount of damage 
+from the ball, i.e. they need to be hit twice to be broken.
 
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+Earth Bricks form a coating around all the bricks on the same row with it. Any 
+ordinary bricks protected by such couting receive only half the amount of damage 
+from the ball, i.e. they need to be hit twice to be broken.
 
-eeeeeeeee
-ff fff fffff
-ggg
+Wind Bricks form a whirlwind around its 3 by 3 proximity. Any ordinary bricks with 
+the range of the whirlwind receive only half the amount of damage from the ball, i.e. 
+they need to be hit twice to be broken. Also the ball will be blowed back with 
+accelerated speed.
 
-eee
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+Thunder Bricks throw thunder balls at the player's paddle at an irregular interval. If
+the paddle is hit by a thunder ball, the paddle is stunned and cannot move within 2 
+seconds.
 
-eeeeeeeee
-ff fff fffff
-ggg
+Fire Bricks throw fire balls at the player's paddle at an irregular interval. If the 
+paddle is hit by a fire ball, the player loses a life instantly.
 
-eee
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+To counter the special bricks, power up items which could grant the player with 
+element power on the ball are available in the game. They are hidden under random 
+bricks and can be collected by hitting the ball at them when their covering bricks 
+are broken.
 
-eeeeeeeee
-ff fff fffff
-ggg
+Multiple power up items can be collected together, however only one can be equiped 
+to the ball at the same time. The selected power up is equiped when the ball hits 
+the paddle again. When the special bricks are hit by the ball when the right power 
+up is equiped, the bricks' element power can be neutralized and result in instant 
+shattering.
 
-eee
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
+The elements neutralize each other's power in the following way:
+Water counters Fire;
+Fire counters Wind;
+Wind counters Thunder;
+Thunder counters Earth;
+Earth counters Water.
 
-eeeeeeeee
-ff fff fffff
-ggg
+For example, when the ball is equiped with Thunder power up, it could destroy a 
+Earthbrick or any bricks covered in Water cushion instantly. However, if the ball 
+is equiped with Water power up, the ball could only deliver 12.5% of its original 
+damage to the Earth Brick, i.e. it needs to hit the Earth Brick 8 times to break 
+it completely. For all other cases (power up used or not), the ball could only 
+deliver 25% of its original damage to the special bricks. When a special brick is
+broken, any ordinary bricks coverred in its special power lose the effect immediately.
 
-eee
-aaaa
-bbbb bbbbbbbb
-dddd ddddd
-
-eeeeeeeee
-ff fff fffff
-ggg
-
-eee
+There is an ultimate brick called the Null Brick. It could absorb the element 
+power equiped on the ball and rende it harmless. So a Null Brick could only be 
+destroyed when no power up is used and it takes 16 hits to destroy a Null Brick. On 
+top of that, a Null Brick could cloak all remaining bricks on the screen with its 
+Null power in a given amount of time. At that time all bricks receive no damage from 
+power up equiped ball and all take 16 hits to be destroyed. When a Null Brick is 
+destroyed, it explodes and eliminates all remaining bricks on the screen, essentially 
+ends the level. But the player would not receive any scores from the bricks destroyed 
+in the explosion.  
