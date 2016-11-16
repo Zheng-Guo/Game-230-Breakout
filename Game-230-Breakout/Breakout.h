@@ -197,7 +197,7 @@ void Breakout::nextLevel() {
 
 void Breakout::startGame() {
 	int startBufferTime = 0, endBufferTime, redFlashDuration = 255, stunnedCounter, explosionCounter = 0, initializeHelpTime = 0,exitHelpTime=0;
-	bool moveLeft = false, moveRight = false, levelStart = true, loseLife = false, stued = false, bossDefeated = false, displayInstruction = false, displayHelp = false, displayHelpText = false, initializeHelp = false, exitHelp = false;
+	bool moveLeft = false, moveRight = false, levelStart = true, loseLife = false, stued = false, bossDefeated = false, displayInstruction = false, displayHelp = false, displayHelpText = false, initializeHelp = false, exitHelp = false,readyToAim=false;
 	float ballradius = ball.getRadius();
 	time1 = clock.getElapsedTime();
 	while (window.isOpen()) {
@@ -209,6 +209,10 @@ void Breakout::startGame() {
 			if (Keyboard::isKeyPressed(Keyboard::Left)&& gameStart)
 				moveLeft = true;
 			if (Keyboard::isKeyPressed(Keyboard::Right)&& gameStart)
+				moveRight = true;
+			if (Keyboard::isKeyPressed(Keyboard::Left) && readyToAim) 
+				moveLeft = true;
+			if (Keyboard::isKeyPressed(Keyboard::Right) && readyToAim)
 				moveRight = true;
 			if (Keyboard::isKeyPressed(Keyboard::Up) && gameStart)
 				player.nextPowerUp();
@@ -224,6 +228,7 @@ void Breakout::startGame() {
 				ball.setYSpeed(Ball_Initial_Speed+ballAcceleration);
 				gameStart = true;
 				displayInstruction = false;
+				readyToAim = false;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Space) && gameOver) {
 				message.setString("");
@@ -233,6 +238,7 @@ void Breakout::startGame() {
 			if (Keyboard::isKeyPressed(Keyboard::H) && displayInstruction&&!displayHelpText&&!exitHelp) {
 				initializeHelp = true;
 				displayHelp = true;
+				readyToAim = false;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::H) && displayHelpText) {
 				displayHelpText = false;
@@ -287,6 +293,7 @@ void Breakout::startGame() {
 					startBufferTime = 0;
 					levelStart = false;
 					displayInstruction = true;
+					readyToAim = true;
 				}
 			}
 			else if (initializeHelp) {
@@ -329,6 +336,7 @@ void Breakout::startGame() {
 					exitHelpTime = 0;
 					exitHelp = false;
 					displayHelp = false;
+					readyToAim = true;
 					helpStartLineNumber = 0;
 					helpEndLineNumber = Number_Of_Help_Lines_Per_Page - 1;
 				}
@@ -340,6 +348,7 @@ void Breakout::startGame() {
 					loseLife = false;
 					redFlashDuration = 255;
 					displayInstruction = true;
+					readyToAim = true;
 				}
 			}
 			else if (!levelEnd) {
@@ -348,6 +357,7 @@ void Breakout::startGame() {
 				if (i == 1) {
 					player.lostLife();
 					moveLeft = false, moveRight = false;
+					readyToAim = false;
 					if (player.getLives() >= 1) {
 						resetPlayer();
 						ostringstream ss;
@@ -373,6 +383,9 @@ void Breakout::startGame() {
 						player.moveLeft();
 					if (moveRight)
 						player.moveRight();
+					if (readyToAim) {
+						ball.setPosition(player.getPaddle().getPosition().x+player.getPaddle().getSize().x/2-ball.getRadius(),ball.getPosition().y);
+					}
 				}
 				player.interact(ball);
 				int s = currentLevel->interact(ball,player);
@@ -387,9 +400,11 @@ void Breakout::startGame() {
 					endBufferTime = 0;
 					moveLeft = false, moveRight = false;
 					gameStart = false, levelEnd = true;
+					readyToAim = false;
 				}
 				if (currentLevel->isBossDefeated()) {
 					bossDefeated = true;
+					readyToAim = false;
 				}
 				if (gameStart) {
 					i = currentLevel->act(player);
